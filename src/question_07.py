@@ -6,8 +6,8 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from q01_data_quality import console
-from q05_decision_tree import MODEL_PATH, ModelArtifacts
+from question_01 import console
+from question_05 import MODEL_PATH, ModelArtifacts
 
 TOP_N = 10
 

@@ -12,10 +12,10 @@ from sklearn.linear_model import ElasticNet
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
-from q01_data_quality import console
-from q15_ols_regression import OLS_PATH, OLSArtifacts
-from q17_ridge import RIDGE_PATH, RidgeArtifacts
-from q18_lasso import LASSO_PATH, LassoArtifacts
+from question_01 import console
+from question_15 import OLS_PATH, OLSArtifacts
+from question_17 import RIDGE_PATH, RidgeArtifacts
+from question_18 import LASSO_PATH, LassoArtifacts
 
 ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 L1_RATIO_GRID: list[float] = [0.1, 0.25, 0.5, 0.75, 0.9]

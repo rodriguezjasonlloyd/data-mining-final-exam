@@ -8,8 +8,8 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.model_selection import train_test_split
 
-from q01_data_quality import clean, console, load_raw
-from q10_standardization import SCALER_PATH, ScalerArtifacts
+from question_01 import clean, console, load_raw
+from question_10 import SCALER_PATH, ScalerArtifacts
 
 SAMPLE_SIZE = 300
 RANDOM_STATE = 42

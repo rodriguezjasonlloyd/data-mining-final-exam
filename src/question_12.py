@@ -7,9 +7,9 @@ from rich.table import Table
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 
-from q01_data_quality import console
-from q10_standardization import SCALER_PATH, ScalerArtifacts
-from q11_clustering import CLUSTER_PATH, NUM_CLUSTERS, SAMPLE_SIZE, ClusterArtifacts
+from question_01 import console
+from question_10 import SCALER_PATH, ScalerArtifacts
+from question_11 import CLUSTER_PATH, NUM_CLUSTERS, SAMPLE_SIZE, ClusterArtifacts
 
 COMPLETE_LINKAGE_METHOD = "complete"
 DISTANCE_METRIC = "euclidean"

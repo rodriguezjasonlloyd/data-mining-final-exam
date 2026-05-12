@@ -4,7 +4,7 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from q01_data_quality import clean, console, load_raw
+from question_01 import clean, console, load_raw
 
 NUMERIC_COLUMNS = [
     "Age",

@@ -9,11 +9,11 @@ from rich.panel import Panel
 from rich.table import Table
 from sklearn.metrics import mean_squared_error, r2_score
 
-from q01_data_quality import console
-from q15_ols_regression import OLS_PATH, OLSArtifacts
-from q17_ridge import RIDGE_PATH, RidgeArtifacts
-from q18_lasso import LASSO_PATH, LassoArtifacts
-from q19_elastic_net import ELASTIC_NET_PATH, ElasticNetArtifacts
+from question_01 import console
+from question_15 import OLS_PATH, OLSArtifacts
+from question_17 import RIDGE_PATH, RidgeArtifacts
+from question_18 import LASSO_PATH, LassoArtifacts
+from question_19 import ELASTIC_NET_PATH, ElasticNetArtifacts
 
 MODEL_COLORS: dict[str, str] = {
     "OLS": "steelblue",

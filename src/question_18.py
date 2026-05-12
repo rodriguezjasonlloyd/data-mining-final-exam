@@ -10,8 +10,8 @@ from sklearn.linear_model import Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
-from q01_data_quality import console
-from q15_ols_regression import OLS_PATH, OLSArtifacts
+from question_01 import console
+from question_15 import OLS_PATH, OLSArtifacts
 
 ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 CV_FOLDS = 5

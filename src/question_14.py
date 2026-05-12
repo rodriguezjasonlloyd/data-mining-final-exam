@@ -6,9 +6,9 @@ from matplotlib.container import BarContainer
 from rich.panel import Panel
 from rich.table import Table
 
-from q01_data_quality import console
-from q12_linkage_comparison import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
-from q13_cluster_profiling import CLUSTER_NAMES
+from question_01 import console
+from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_13 import CLUSTER_NAMES
 
 ATTRITION_LABELS: dict[int, str] = {0: "Stayed", 1: "Left"}
 

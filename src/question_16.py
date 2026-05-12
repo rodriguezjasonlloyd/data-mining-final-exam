@@ -5,8 +5,8 @@ from rich.panel import Panel
 from rich.table import Table
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
-from q01_data_quality import console
-from q15_ols_regression import OLS_PATH, OLSArtifacts
+from question_01 import console
+from question_15 import OLS_PATH, OLSArtifacts
 
 VIF_HIGH_THRESHOLD = 10.0
 VIF_MODERATE_THRESHOLD = 5.0

@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 
-from q01_data_quality import clean, console, load_raw
+from question_01 import clean, console, load_raw
 
 CATEGORICAL_COLUMNS = [
     "Gender",

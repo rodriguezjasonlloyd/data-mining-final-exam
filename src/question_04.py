@@ -1,10 +1,9 @@
+from question_01 import console, clean, load_raw
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
-
-from q01_data_quality import clean, console, load_raw
 
 
 def compute_attrition_rate(df: pd.DataFrame, by: str) -> pd.DataFrame:

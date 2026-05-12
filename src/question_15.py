@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
-from q01_data_quality import clean, console, load_raw
+from question_01 import clean, console, load_raw
 
 CATEGORICAL_COLUMNS = [
     "Gender",

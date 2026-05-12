@@ -6,8 +6,8 @@ from rich.panel import Panel
 from rich.table import Table
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
-from q01_data_quality import console
-from q05_decision_tree import MODEL_PATH, ModelArtifacts
+from question_01 import console
+from question_05 import MODEL_PATH, ModelArtifacts
 
 PRUNED_DEPTH = 4
 

@@ -3,11 +3,11 @@ import pandas as pd
 from rich.panel import Panel
 from rich.table import Table
 
-from q01_data_quality import clean, console, load_raw
-from q05_decision_tree import MODEL_PATH, ModelArtifacts
-from q12_linkage_comparison import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
-from q18_lasso import LASSO_PATH, LassoArtifacts
-from q21_high_risk_analysis import build_master_frame, get_flight_risk_ids
+from question_01 import clean, console, load_raw
+from question_05 import MODEL_PATH, ModelArtifacts
+from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_18 import LASSO_PATH, LassoArtifacts
+from question_21 import build_master_frame, get_flight_risk_ids
 
 
 def load_model_artifacts() -> ModelArtifacts:

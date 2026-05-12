@@ -5,8 +5,8 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from q01_data_quality import console
-from q12_linkage_comparison import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_01 import console
+from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
 
 BOX_PLOT_FEATURES = [
     "Monthly_Salary_PHP",
