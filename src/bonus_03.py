@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 from question_01 import console, get_clean_df
-from question_05 import DROP_COLUMNS, encode
+from question_05 import ATTRITION_DROP_COLUMNS, encode
 from question_17 import RidgeArtifacts, get_ridge_artifacts
 from question_18 import LassoArtifacts, get_lasso_artifacts
 
@@ -59,7 +59,7 @@ def engineer(df: pd.DataFrame) -> pd.DataFrame:
 
 def prepare_tree(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     encoded = encode(df)
-    x = encoded.drop(columns=DROP_COLUMNS)
+    x = encoded.drop(columns=ATTRITION_DROP_COLUMNS)
     y = encoded["Attrition"]
     return x, y
 

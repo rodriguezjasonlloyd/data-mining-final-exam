@@ -16,7 +16,7 @@ from sklearn.preprocessing import LabelEncoder
 from question_01 import console, get_clean_df
 
 CATEGORICAL_COLUMNS = ["Gender", "Marital_Status", "Region", "Education_Level", "Department", "Employment_Type", "Shift", "Performance_Rating"]
-DROP_COLUMNS = ["Employee_ID", "Hire_Date", "Monthly_Salary_PHP", "Attrition"]
+SALARY_DROP_COLUMNS = ["Employee_ID", "Hire_Date", "Monthly_Salary_PHP", "Attrition"]
 TARGET_COLUMN = "Monthly_Salary_PHP"
 
 
@@ -48,7 +48,7 @@ def encode(df: pd.DataFrame) -> pd.DataFrame:
 
 def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     encoded = encode(df)
-    x = encoded.drop(columns=DROP_COLUMNS)
+    x = encoded.drop(columns=SALARY_DROP_COLUMNS)
     y = encoded[TARGET_COLUMN]
     return x, y
 

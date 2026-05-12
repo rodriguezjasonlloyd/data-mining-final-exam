@@ -23,7 +23,7 @@ CATEGORICAL_COLUMNS = [
     "Performance_Rating",
 ]
 
-DROP_COLUMNS = [
+ATTRITION_DROP_COLUMNS = [
     "Employee_ID",
     "Hire_Date",
     "Attrition",
@@ -59,7 +59,7 @@ def encode(df: pd.DataFrame) -> pd.DataFrame:
 
 def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     encoded = encode(df)
-    x = encoded.drop(columns=DROP_COLUMNS)
+    x = encoded.drop(columns=ATTRITION_DROP_COLUMNS)
     y = encoded["Attrition"]
     return x, y
 
