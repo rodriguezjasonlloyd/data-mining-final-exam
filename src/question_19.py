@@ -1,4 +1,3 @@
-import warnings
 
 import joblib
 import matplotlib.pyplot as plt
@@ -57,9 +56,7 @@ def train_elastic_net(ols_artifacts: OLSArtifacts) -> ElasticNetArtifacts:
         scoring="neg_root_mean_squared_error",
     )
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        grid_search.fit(ols_artifacts.x_train, ols_artifacts.y_train)
+    grid_search.fit(ols_artifacts.x_train, ols_artifacts.y_train)
 
     optimal_alpha: float = float(grid_search.best_params_["alpha"])
     optimal_l1_ratio: float = float(grid_search.best_params_["l1_ratio"])
