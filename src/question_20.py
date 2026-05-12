@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 import joblib
 import matplotlib.pyplot as plt
