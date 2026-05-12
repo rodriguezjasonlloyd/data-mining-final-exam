@@ -6,11 +6,10 @@ from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console, get_clean_df
-from question_05 import ModelArtifacts, get_model_artifacts
-from question_05 import prepare as prepare_attrition
+from question_05 import ModelArtifacts, get_model_artifacts, prepare_attrition
 from question_12 import CompleteLinkageArtifacts, get_complete_cluster_artifacts
 from question_13 import CLUSTER_NAMES
-from question_15 import prepare as prepare_salary
+from question_15 import prepare_salary
 from question_18 import LassoArtifacts, get_lasso_artifacts
 
 FLIGHT_RISK_LABEL = "Flight Risk"
