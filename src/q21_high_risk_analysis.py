@@ -1,0 +1,143 @@
+from __future__ import annotations
+
+import joblib
+import numpy as np
+import pandas as pd
+from rich.panel import Panel
+from rich.table import Table
+
+from q01_data_quality import clean, console, load_raw
+from q05_decision_tree import MODEL_PATH, ModelArtifacts
+from q05_decision_tree import prepare as prepare_attrition
+from q12_linkage_comparison import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from q13_cluster_profiling import CLUSTER_NAMES
+from q15_ols_regression import prepare as prepare_salary
+from q18_lasso import LASSO_PATH, LassoArtifacts
+
+FLIGHT_RISK_LABEL = "Flight Risk"
+TOP_N = 10
+
+
+def load_model_artifacts() -> ModelArtifacts:
+    return ModelArtifacts(**joblib.load(MODEL_PATH))
+
+
+def load_cluster_artifacts() -> CompleteLinkageArtifacts:
+    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
+
+
+def load_lasso_artifacts() -> LassoArtifacts:
+    return LassoArtifacts(**joblib.load(LASSO_PATH))
+
+
+def get_flight_risk_ids(cluster_artifacts: CompleteLinkageArtifacts) -> set[str]:
+    flight_risk_cluster_id: int = next(k for k, v in CLUSTER_NAMES.items() if v == FLIGHT_RISK_LABEL)
+    sample = cluster_artifacts.sample_df.copy()
+    sample["Cluster"] = cluster_artifacts.cluster_labels
+    return set(sample.loc[sample["Cluster"] == flight_risk_cluster_id, "Employee_ID"].astype(str))
+
+
+def build_master_frame(
+    clean_df: pd.DataFrame,
+    model_artifacts: ModelArtifacts,
+    lasso_artifacts: LassoArtifacts,
+) -> pd.DataFrame:
+    x_class, _y_class = prepare_attrition(clean_df)
+    attrition_probability: np.ndarray = model_artifacts.model.predict_proba(x_class)[:, 1]
+
+    x_salary, _y_salary = prepare_salary(clean_df)
+    predicted_salary: np.ndarray = lasso_artifacts.model.predict(x_salary)
+
+    master = clean_df[["Employee_ID", "Monthly_Salary_PHP"]].copy().reset_index(drop=True)
+    master["attrition_probability"] = attrition_probability
+    master["predicted_attrition"] = (attrition_probability >= 0.5).astype(int)
+    master["predicted_salary"] = predicted_salary
+    master["salary_gap"] = master["Monthly_Salary_PHP"] - master["predicted_salary"]
+    master["Employee_ID"] = master["Employee_ID"].astype(str)
+    return master
+
+
+def identify_high_risk(master: pd.DataFrame, flight_risk_ids: set[str]) -> pd.DataFrame:
+    high_risk = master[(master["predicted_attrition"] == 1) & (master["Employee_ID"].isin(flight_risk_ids))].copy()
+    return high_risk.sort_values("attrition_probability", ascending=False).head(TOP_N)
+
+
+def report_high_risk(high_risk: pd.DataFrame) -> None:
+    table = Table(title=f"Top {TOP_N} High-Risk Employees — DT Predicted Leave + Flight Risk Cluster", show_lines=True)
+    table.add_column("Employee_ID", style="cyan")
+    table.add_column("Actual Salary (PHP)", justify="right")
+    table.add_column("Predicted Salary (PHP)", justify="right")
+    table.add_column("Salary Gap (PHP)", justify="right")
+    table.add_column("Attrition Probability", justify="right")
+
+    for _, row in high_risk.iterrows():
+        gap: float = row["salary_gap"]
+        gap_color = "red" if gap < -5000 else "yellow" if gap < 0 else "green"
+        table.add_row(
+            str(row["Employee_ID"]),
+            f"{row['Monthly_Salary_PHP']:,.0f}",
+            f"{row['predicted_salary']:,.0f}",
+            f"[{gap_color}]{gap:+,.0f}[/{gap_color}]",
+            f"{row['attrition_probability']:.3f}",
+        )
+
+    console.print(table)
+
+
+def report_salary_summary(high_risk: pd.DataFrame) -> None:
+    underpaid = high_risk[high_risk["salary_gap"] < 0]
+    underpaid_count: int = len(underpaid)
+    avg_gap: float = float(high_risk["salary_gap"].mean())
+    avg_actual: float = float(high_risk["Monthly_Salary_PHP"].mean())
+    avg_predicted: float = float(high_risk["predicted_salary"].mean())
+
+    gap_color = "red" if avg_gap < 0 else "green"
+
+    summary = (
+        f"[bold]Employees analyzed:[/bold] {len(high_risk)}\n"
+        f"[bold]Underpaid (actual < predicted):[/bold] [red]{underpaid_count}[/red] of {len(high_risk)}\n"
+        f"[bold]Average actual salary:[/bold] PHP {avg_actual:,.0f}\n"
+        f"[bold]Average predicted salary:[/bold] PHP {avg_predicted:,.0f}\n"
+        f"[bold]Average salary gap:[/bold] [{gap_color}]PHP {avg_gap:+,.0f}[/{gap_color}]\n\n"
+        f"[bold]Interpretation:[/bold]\n"
+        f"A negative salary gap means the employee earns less than what their profile predicts — "
+        f"a strong signal of underpayment. For employees who are both flagged by the Decision Tree "
+        f"as likely to leave and placed in the Flight Risk cluster by unsupervised clustering, "
+        f"underpayment compounds the departure risk. HR should prioritize salary reviews for "
+        f"individuals with the largest negative gaps and highest attrition probabilities."
+    )
+
+    console.print(Panel(summary, title="Q21 — Salary Gap Analysis"))
+
+
+def main() -> None:
+    clean_df = clean(load_raw())
+
+    console.print(
+        Panel(
+            f"[bold]Dataset:[/bold] {len(clean_df)} employees\n[bold]Criteria:[/bold] Decision Tree predicted leave AND assigned to Flight Risk cluster",
+            title="Workforce Attrition — Q21 High-Risk Employee Analysis",
+        ),
+    )
+
+    model_artifacts = load_model_artifacts()
+    cluster_artifacts = load_cluster_artifacts()
+    lasso_artifacts = load_lasso_artifacts()
+
+    flight_risk_ids = get_flight_risk_ids(cluster_artifacts)
+    console.print(f"[dim]Flight Risk cluster size: {len(flight_risk_ids)} employees (from 300-employee sample)[/dim]")
+
+    master = build_master_frame(clean_df, model_artifacts, lasso_artifacts)
+
+    dt_predicted_leave: int = int(master["predicted_attrition"].sum())
+    console.print(f"[dim]DT predicted leave (full dataset): {dt_predicted_leave} of {len(master)} employees[/dim]")
+
+    high_risk = identify_high_risk(master, flight_risk_ids)
+    console.print(f"[dim]Intersection (both criteria): {len(high_risk)} employees — showing top {TOP_N}[/dim]\n")
+
+    report_high_risk(high_risk)
+    report_salary_summary(high_risk)
+
+
+if __name__ == "__main__":
+    main()
