@@ -6,7 +6,7 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
 EDUCATION_ORDER = ["High School", "Vocational", "Bachelor", "Master", "Phd"]
 
@@ -77,7 +77,7 @@ def plot_heatmap(corr: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    df = encode_education(clean(load_raw()))
+    df = encode_education(get_clean_df())
 
     console.print(
         Panel(

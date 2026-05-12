@@ -1,6 +1,7 @@
 """Q10. Data Standardization."""
 
-import joblib
+from functools import cache
+
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
@@ -8,7 +9,7 @@ from rich.panel import Panel
 from rich.table import Table
 from sklearn.preprocessing import StandardScaler
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
 CLUSTERING_FEATURES = [
     "Monthly_Salary_PHP",
@@ -21,8 +22,10 @@ CLUSTERING_FEATURES = [
     "Overtime_Hours_Monthly",
 ]
 
-SCALER_PATH = "scaler.joblib"
-SCALED_DATA_PATH = "scaled_data.joblib"
+
+@cache
+def get_scaler_artifacts() -> ScalerArtifacts:
+    return standardize(get_clean_df())
 
 
 class ScalerArtifacts(BaseModel):
@@ -75,7 +78,7 @@ def report_standardization(df: pd.DataFrame, artifacts: ScalerArtifacts) -> None
 
 
 def main() -> None:
-    df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
@@ -84,11 +87,9 @@ def main() -> None:
         ),
     )
 
-    artifacts = standardize(df)
-    report_standardization(df, artifacts)
+    scaler_artifacts = standardize(df)
 
-    joblib.dump(artifacts.model_dump(), SCALER_PATH)
-    console.print(f"[dim]Scaler and scaled data saved to {SCALER_PATH}[/dim]")
+    report_standardization(df, scaler_artifacts)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 """Q20. Regression Model Comparison."""
 
-import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -10,10 +9,10 @@ from rich.table import Table
 from sklearn.metrics import mean_squared_error, r2_score
 
 from question_01 import console
-from question_15 import OLS_PATH, OLSArtifacts
-from question_17 import RIDGE_PATH, RidgeArtifacts
-from question_18 import LASSO_PATH, LassoArtifacts
-from question_19 import ELASTIC_NET_PATH, ElasticNetArtifacts
+from question_15 import OLSArtifacts, get_ols_artifacts
+from question_17 import RidgeArtifacts, get_ridge_artifacts
+from question_18 import LassoArtifacts, get_lasso_artifacts
+from question_19 import ElasticNetArtifacts, get_elastic_net_artifacts
 
 MODEL_COLORS: dict[str, str] = {
     "OLS": "steelblue",
@@ -21,22 +20,6 @@ MODEL_COLORS: dict[str, str] = {
     "Lasso": "tomato",
     "Elastic Net": "mediumseagreen",
 }
-
-
-def load_ols_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
-
-
-def load_ridge_artifacts() -> RidgeArtifacts:
-    return RidgeArtifacts(**joblib.load(RIDGE_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
-
-
-def load_elastic_net_artifacts() -> ElasticNetArtifacts:
-    return ElasticNetArtifacts(**joblib.load(ELASTIC_NET_PATH))
 
 
 def compute_ols_test_metrics(ols_artifacts: OLSArtifacts) -> tuple[float, float, int]:
@@ -216,17 +199,17 @@ def plot_nonzero_coefficients(comparison: pd.DataFrame) -> None:
 
 
 def main() -> None:
+    ols_artifacts = get_ols_artifacts()
+    ridge_artifacts = get_ridge_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
+    elastic_net_artifacts = get_elastic_net_artifacts()
+
     console.print(
         Panel(
             "Comparing OLS, Ridge, Lasso, and Elastic Net on test R², test RMSE, non-zero coefficients, and optimal λ.",
             title="Workforce Attrition — Q20 Regression Model Comparison",
         ),
     )
-
-    ols_artifacts = load_ols_artifacts()
-    ridge_artifacts = load_ridge_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
-    elastic_net_artifacts = load_elastic_net_artifacts()
 
     comparison = build_comparison_dataframe(ols_artifacts, ridge_artifacts, lasso_artifacts, elastic_net_artifacts)
 

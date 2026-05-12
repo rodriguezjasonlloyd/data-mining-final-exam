@@ -2,7 +2,6 @@
 
 import warnings
 
-import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,8 +12,8 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
 
-from question_01 import clean, console, load_raw
-from question_10 import SCALER_PATH, ScalerArtifacts
+from question_01 import console, get_clean_df
+from question_10 import get_scaler_artifacts
 from question_11 import NUM_CLUSTERS, SAMPLE_SIZE, sample_employees
 
 DISTANCE_METRICS: list[str] = ["euclidean", "manhattan"]
@@ -37,10 +36,6 @@ class CombinationResult(BaseModel):
     cluster_sizes: dict[int, int]
     balance_ratio: float
     silhouette: float
-
-
-def load_scaler_artifacts() -> ScalerArtifacts:
-    return ScalerArtifacts(**joblib.load(SCALER_PATH))
 
 
 def is_valid_combination(linkage_method: str, distance_metric: str) -> bool:
@@ -177,8 +172,8 @@ def plot_dendrograms(results: list[CombinationResult]) -> None:
 
 
 def main() -> None:
-    scaler_artifacts = load_scaler_artifacts()
-    df = clean(load_raw())
+    scaler_artifacts = get_scaler_artifacts()
+    df = get_clean_df()
     _sample_df, scaled_sample = sample_employees(df, scaler_artifacts)
 
     combinations = valid_combinations()

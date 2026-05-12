@@ -1,6 +1,5 @@
 """Q16. Multicollinearity and VIF."""
 
-import joblib
 import pandas as pd
 import statsmodels.api as sm
 from rich.panel import Panel
@@ -8,14 +7,10 @@ from rich.table import Table
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 from question_01 import console
-from question_15 import OLS_PATH, OLSArtifacts
+from question_15 import get_ols_artifacts
 
 VIF_HIGH_THRESHOLD = 10.0
 VIF_MODERATE_THRESHOLD = 5.0
-
-
-def load_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
 
 
 def compute_vif(x_train: pd.DataFrame) -> pd.DataFrame:
@@ -60,7 +55,7 @@ def report_vif(vif_df: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_ols_artifacts()
 
     console.print(
         Panel(

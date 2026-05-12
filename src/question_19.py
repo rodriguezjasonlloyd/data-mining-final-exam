@@ -1,6 +1,7 @@
 """Q19. Elastic Net Regression."""
 
-import joblib
+from functools import cache
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,14 +14,18 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
 from question_01 import console
-from question_15 import OLS_PATH, OLSArtifacts
-from question_17 import RIDGE_PATH, RidgeArtifacts
-from question_18 import LASSO_PATH, LassoArtifacts
+from question_15 import OLSArtifacts, get_ols_artifacts
+from question_17 import RidgeArtifacts, get_ridge_artifacts
+from question_18 import LassoArtifacts, get_lasso_artifacts
 
 ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 L1_RATIO_GRID: list[float] = [0.1, 0.25, 0.5, 0.75, 0.9]
 CV_FOLDS = 5
-ELASTIC_NET_PATH = "elastic_net.joblib"
+
+
+@cache
+def get_elastic_net_artifacts() -> ElasticNetArtifacts:
+    return train_elastic_net(get_ols_artifacts())
 
 
 class ElasticNetArtifacts(BaseModel):
@@ -35,18 +40,6 @@ class ElasticNetArtifacts(BaseModel):
     train_rmse: float
     test_rmse: float
     nonzero_count: int
-
-
-def load_ols_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
-
-
-def load_ridge_artifacts() -> RidgeArtifacts:
-    return RidgeArtifacts(**joblib.load(RIDGE_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
 
 
 def train_elastic_net(ols_artifacts: OLSArtifacts) -> ElasticNetArtifacts:
@@ -219,6 +212,10 @@ def plot_coefficient_comparison(
 
 
 def main() -> None:
+    ols_artifacts = get_ols_artifacts()
+    ridge_artifacts = get_ridge_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
+
     console.print(
         Panel(
             f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]L1 Ratio grid:[/bold] {L1_RATIO_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}",
@@ -226,19 +223,12 @@ def main() -> None:
         ),
     )
 
-    ols_artifacts = load_ols_artifacts()
-    ridge_artifacts = load_ridge_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
-
-    elastic_net_artifacts = train_elastic_net(ols_artifacts)
+    elastic_net_artifacts = get_elastic_net_artifacts()
 
     report_metrics(elastic_net_artifacts)
     report_coefficient_comparison(ols_artifacts, ridge_artifacts, lasso_artifacts, elastic_net_artifacts)
     report_model_comparison(ridge_artifacts, lasso_artifacts, elastic_net_artifacts)
     plot_coefficient_comparison(ols_artifacts, ridge_artifacts, lasso_artifacts, elastic_net_artifacts)
-
-    joblib.dump(elastic_net_artifacts.model_dump(), ELASTIC_NET_PATH)
-    console.print(f"[dim]Elastic Net artifacts saved to {ELASTIC_NET_PATH}[/dim]")
 
 
 if __name__ == "__main__":

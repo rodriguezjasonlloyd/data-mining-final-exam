@@ -1,6 +1,5 @@
 """Bonus 1. Decision Tree Optimization."""
 
-import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
 from rich.panel import Panel
@@ -9,11 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 
 from question_01 import console
-from question_05 import MODEL_PATH, ModelArtifacts
-
-
-def load_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
+from question_05 import ModelArtifacts, get_model_artifacts
 
 
 def compute_depth_curve(artifacts: ModelArtifacts) -> pd.DataFrame:
@@ -116,7 +111,7 @@ def plot_depth_curve(curve: pd.DataFrame, optimal_depth: int) -> None:
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_model_artifacts()
 
     console.print(
         Panel(

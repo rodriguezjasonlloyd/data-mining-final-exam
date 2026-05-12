@@ -6,7 +6,7 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
 NUMERIC_COLUMNS = [
     "Age",
@@ -75,7 +75,7 @@ def plot_top_skewed(df: pd.DataFrame, skewness: pd.Series) -> None:
 
 
 def main() -> None:
-    df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(

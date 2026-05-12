@@ -1,6 +1,5 @@
 """Q9. Decision Path Interpretation."""
 
-import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -9,7 +8,7 @@ from rich.table import Table
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 from question_01 import console
-from question_05 import MODEL_PATH, ModelArtifacts
+from question_05 import ModelArtifacts, get_model_artifacts
 
 PRUNED_DEPTH = 4
 
@@ -35,10 +34,6 @@ HYPOTHETICAL_EMPLOYEE: dict[str, float | int] = {
     "Num_Promotions": 0,
     "Prev_Companies": 2,
 }
-
-
-def load_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
 
 
 def build_pruned_model(artifacts: ModelArtifacts) -> DecisionTreeClassifier:
@@ -163,7 +158,7 @@ def plot_pruned_tree(pruned_model: DecisionTreeClassifier, feature_names: list[s
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_model_artifacts()
     pruned_model = build_pruned_model(artifacts)
     feature_names: list[str] = list(artifacts.x_train.columns)
     employee_frame = build_employee_frame(artifacts)

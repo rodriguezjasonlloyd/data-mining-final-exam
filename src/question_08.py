@@ -1,6 +1,5 @@
-"""Q8. Tree Pruning and Bias–Variance Tradeoff."""
+"""Q8. Tree Pruning and Bias-Variance Tradeoff."""
 
-import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
 from rich.panel import Panel
@@ -9,13 +8,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 
 from question_01 import console
-from question_05 import MODEL_PATH, ModelArtifacts
+from question_05 import ModelArtifacts, get_model_artifacts
 
 PRUNED_DEPTH = 4
-
-
-def load_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
 
 
 def train_at_depth(artifacts: ModelArtifacts, depth: int) -> tuple[float, float]:
@@ -90,7 +85,7 @@ def plot_depth_curve(curve: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_model_artifacts()
 
     console.print(
         Panel(

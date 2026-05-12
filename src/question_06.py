@@ -1,6 +1,5 @@
 """Q6. Model Evaluation."""
 
-import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -9,11 +8,7 @@ from rich.table import Table
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 from question_01 import console
-from question_05 import MODEL_PATH, ModelArtifacts
-
-
-def load_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
+from question_05 import ModelArtifacts, get_model_artifacts
 
 
 def report_metrics(artifacts: ModelArtifacts) -> np.ndarray:
@@ -76,7 +71,7 @@ def plot_confusion_matrix(artifacts: ModelArtifacts, y_prediction: np.ndarray) -
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_model_artifacts()
 
     console.print(
         Panel(

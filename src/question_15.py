@@ -1,6 +1,7 @@
 """Q15. Ordinary Least Squares (OLS) Regression."""
 
-import joblib
+from functools import cache
+
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -12,28 +13,17 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
-CATEGORICAL_COLUMNS = [
-    "Gender",
-    "Marital_Status",
-    "Region",
-    "Education_Level",
-    "Department",
-    "Employment_Type",
-    "Shift",
-    "Performance_Rating",
-]
-
-DROP_COLUMNS = [
-    "Employee_ID",
-    "Hire_Date",
-    "Monthly_Salary_PHP",
-    "Attrition",
-]
-
+CATEGORICAL_COLUMNS = ["Gender", "Marital_Status", "Region", "Education_Level", "Department", "Employment_Type", "Shift", "Performance_Rating"]
+DROP_COLUMNS = ["Employee_ID", "Hire_Date", "Monthly_Salary_PHP", "Attrition"]
 TARGET_COLUMN = "Monthly_Salary_PHP"
-OLS_PATH = "ols.joblib"
+
+
+@cache
+def get_ols_artifacts() -> OLSArtifacts:
+    x, y = prepare(get_clean_df())
+    return train_ols(x, y)
 
 
 class OLSArtifacts(BaseModel):
@@ -150,7 +140,7 @@ def report_statsmodels_summary(x_train: pd.DataFrame, y_train: pd.Series) -> Non
 
 
 def main() -> None:
-    df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
@@ -159,22 +149,18 @@ def main() -> None:
         ),
     )
 
-    x, y = prepare(df)
-    artifacts = train_ols(x, y)
-    metrics = compute_metrics(artifacts)
+    ols_artifacts = get_ols_artifacts()
+    metrics = compute_metrics(ols_artifacts)
 
     report_metrics(metrics)
-    report_statsmodels_summary(artifacts.x_train, artifacts.y_train)
+    report_statsmodels_summary(ols_artifacts.x_train, ols_artifacts.y_train)
 
     console.print(
         Panel(
-            f"[bold]Train samples:[/bold] {artifacts.x_train.shape[0]}  [bold]Test samples:[/bold] {artifacts.x_test.shape[0]}  [bold]Features:[/bold] {len(artifacts.feature_names)}",
+            f"[bold]Train samples:[/bold] {ols_artifacts.x_train.shape[0]}  [bold]Test samples:[/bold] {ols_artifacts.x_test.shape[0]}  [bold]Features:[/bold] {len(ols_artifacts.feature_names)}",
             title="Train/Test Split (70/30)",
         ),
     )
-
-    joblib.dump(artifacts.model_dump(), OLS_PATH)
-    console.print(f"[dim]OLS artifacts saved to {OLS_PATH}[/dim]")
 
 
 if __name__ == "__main__":

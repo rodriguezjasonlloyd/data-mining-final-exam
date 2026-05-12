@@ -1,6 +1,7 @@
 """Q18. Lasso Regression."""
 
-import joblib
+from functools import cache
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,11 +14,15 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
 from question_01 import console
-from question_15 import OLS_PATH, OLSArtifacts
+from question_15 import OLSArtifacts, get_ols_artifacts
 
 ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 CV_FOLDS = 5
-LASSO_PATH = "lasso.joblib"
+
+
+@cache
+def get_lasso_artifacts() -> LassoArtifacts:
+    return train_lasso(get_ols_artifacts())
 
 
 class LassoArtifacts(BaseModel):
@@ -31,10 +36,6 @@ class LassoArtifacts(BaseModel):
     train_rmse: float
     test_rmse: float
     nonzero_count: int
-
-
-def load_ols_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
 
 
 def train_lasso(ols_artifacts: OLSArtifacts) -> LassoArtifacts:
@@ -177,7 +178,7 @@ def plot_lasso_path(ols_artifacts: OLSArtifacts) -> None:
 
 
 def main() -> None:
-    ols_artifacts = load_ols_artifacts()
+    ols_artifacts = get_ols_artifacts()
 
     console.print(
         Panel(
@@ -186,14 +187,11 @@ def main() -> None:
         ),
     )
 
-    lasso_artifacts = train_lasso(ols_artifacts)
+    lasso_artifacts = get_lasso_artifacts()
     report_metrics(lasso_artifacts)
     report_coefficient_sparsity(ols_artifacts, lasso_artifacts)
     plot_coefficient_comparison(ols_artifacts, lasso_artifacts)
     plot_lasso_path(ols_artifacts)
-
-    joblib.dump(lasso_artifacts.model_dump(), LASSO_PATH)
-    console.print(f"[dim]Lasso artifacts saved to {LASSO_PATH}[/dim]")
 
 
 if __name__ == "__main__":

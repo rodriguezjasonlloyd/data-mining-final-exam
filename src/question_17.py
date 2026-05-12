@@ -1,6 +1,7 @@
 """Q17. Ridge Regression."""
 
-import joblib
+from functools import cache
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,11 +14,15 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
 from question_01 import console
-from question_15 import OLS_PATH, OLSArtifacts
+from question_15 import OLSArtifacts, get_ols_artifacts
 
 ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 CV_FOLDS = 5
-RIDGE_PATH = "ridge.joblib"
+
+
+@cache
+def get_ridge_artifacts() -> RidgeArtifacts:
+    return train_ridge(get_ols_artifacts())
 
 
 class RidgeArtifacts(BaseModel):
@@ -30,10 +35,6 @@ class RidgeArtifacts(BaseModel):
     test_r2: float
     train_rmse: float
     test_rmse: float
-
-
-def load_ols_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
 
 
 def train_ridge(ols_artifacts: OLSArtifacts) -> RidgeArtifacts:
@@ -136,7 +137,7 @@ def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: Ri
 
 
 def main() -> None:
-    ols_artifacts = load_ols_artifacts()
+    ols_artifacts = get_ols_artifacts()
 
     console.print(
         Panel(
@@ -145,13 +146,10 @@ def main() -> None:
         ),
     )
 
-    ridge_artifacts = train_ridge(ols_artifacts)
+    ridge_artifacts = get_ridge_artifacts()
     report_metrics(ridge_artifacts)
     report_coefficient_comparison(ols_artifacts, ridge_artifacts)
     plot_coefficient_comparison(ols_artifacts, ridge_artifacts)
-
-    joblib.dump(ridge_artifacts.model_dump(), RIDGE_PATH)
-    console.print(f"[dim]Ridge artifacts saved to {RIDGE_PATH}[/dim]")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 """Q23. Recommendation for the CHRO."""
 
-import joblib
 import numpy as np
 import pandas as pd
 from rich.panel import Panel
@@ -8,24 +7,12 @@ from rich.rule import Rule
 from rich.table import Table
 from sklearn.metrics import accuracy_score
 
-from question_01 import clean, console, load_raw
-from question_05 import MODEL_PATH, ModelArtifacts
-from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_01 import console, get_clean_df
+from question_05 import ModelArtifacts, get_model_artifacts
+from question_12 import CompleteLinkageArtifacts, get_complete_cluster_artifacts
 from question_13 import CLUSTER_INTERVENTIONS, CLUSTER_NAMES
-from question_18 import LASSO_PATH, LassoArtifacts
+from question_18 import LassoArtifacts, get_lasso_artifacts
 from question_21 import build_master_frame, get_flight_risk_ids
-
-
-def load_model_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
-
-
-def load_cluster_artifacts() -> CompleteLinkageArtifacts:
-    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
 
 
 def compute_dt_accuracy(model_artifacts: ModelArtifacts) -> float:
@@ -190,23 +177,23 @@ The Lasso regression explains [green]{lasso_artifacts.test_r2:.1%}[/green] of sa
 
 
 def main() -> None:
-    clean_df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
-            f"[bold]Dataset:[/bold] {len(clean_df):,} employees over 15 years\n[bold]Models:[/bold] Decision Tree · Hierarchical Clustering · Lasso Regression",
+            f"[bold]Dataset:[/bold] {len(df):,} employees over 15 years\n[bold]Models:[/bold] Decision Tree · Hierarchical Clustering · Lasso Regression",
             title="Workforce Attrition — Q23 CHRO Recommendation Report",
         ),
     )
 
-    model_artifacts = load_model_artifacts()
-    cluster_artifacts = load_cluster_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
+    model_artifacts = get_model_artifacts()
+    cluster_artifacts = get_complete_cluster_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
 
     dt_accuracy = compute_dt_accuracy(model_artifacts)
     cluster_summary = build_cluster_summary(cluster_artifacts)
     flight_risk_ids = get_flight_risk_ids(cluster_artifacts)
-    master = build_master_frame(clean_df, model_artifacts, lasso_artifacts)
+    master = build_master_frame(df, model_artifacts, lasso_artifacts)
     master["Employee_ID"] = master["Employee_ID"].astype(str)
 
     console.print(Rule("Model Performance"))

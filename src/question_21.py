@@ -1,33 +1,20 @@
 """Q21. High-Risk Employee Analysis."""
 
-import joblib
 import numpy as np
 import pandas as pd
 from rich.panel import Panel
 from rich.table import Table
 
-from question_01 import clean, console, load_raw
-from question_05 import MODEL_PATH, ModelArtifacts
+from question_01 import console, get_clean_df
+from question_05 import ModelArtifacts, get_model_artifacts
 from question_05 import prepare as prepare_attrition
-from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_12 import CompleteLinkageArtifacts, get_complete_cluster_artifacts
 from question_13 import CLUSTER_NAMES
 from question_15 import prepare as prepare_salary
-from question_18 import LASSO_PATH, LassoArtifacts
+from question_18 import LassoArtifacts, get_lasso_artifacts
 
 FLIGHT_RISK_LABEL = "Flight Risk"
 TOP_N = 10
-
-
-def load_model_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
-
-
-def load_cluster_artifacts() -> CompleteLinkageArtifacts:
-    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
 
 
 def get_flight_risk_ids(cluster_artifacts: CompleteLinkageArtifacts) -> set[str]:
@@ -111,23 +98,23 @@ def report_salary_summary(high_risk: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    clean_df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
-            f"[bold]Dataset:[/bold] {len(clean_df)} employees\n[bold]Criteria:[/bold] Decision Tree predicted leave AND assigned to Flight Risk cluster",
+            f"[bold]Dataset:[/bold] {len(df)} employees\n[bold]Criteria:[/bold] Decision Tree predicted leave AND assigned to Flight Risk cluster",
             title="Workforce Attrition — Q21 High-Risk Employee Analysis",
         ),
     )
 
-    model_artifacts = load_model_artifacts()
-    cluster_artifacts = load_cluster_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
+    model_artifacts = get_model_artifacts()
+    cluster_artifacts = get_complete_cluster_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
 
     flight_risk_ids = get_flight_risk_ids(cluster_artifacts)
     console.print(f"[dim]Flight Risk cluster size: {len(flight_risk_ids)} employees (from 300-employee sample)[/dim]")
 
-    master = build_master_frame(clean_df, model_artifacts, lasso_artifacts)
+    master = build_master_frame(df, model_artifacts, lasso_artifacts)
 
     dt_predicted_leave: int = int(master["predicted_attrition"].sum())
     console.print(f"[dim]DT predicted leave (full dataset): {dt_predicted_leave} of {len(master)} employees[/dim]")

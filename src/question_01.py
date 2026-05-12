@@ -1,5 +1,7 @@
 """Q1. Data Quality Assessment."""
 
+from functools import cache
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -24,7 +26,14 @@ def _init_backend() -> str:
 
 
 console = Console()
-backend = _init_backend()
+
+_init_backend()
+
+
+@cache
+def get_clean_df() -> pd.DataFrame:
+    return clean(load_raw())
+
 
 AGE_MIN = 15
 AGE_MAX = 80
@@ -290,11 +299,12 @@ def main() -> None:
     plot_numeric_distributions(df)
     plot_missing(missing_df)
 
-    cleaned = clean(df)
+    clean_df = get_clean_df()
+
     console.print(
         Panel(
-            f"[green]Cleaned dataset:[/green] {cleaned.shape[0]} rows x {cleaned.shape[1]} columns\n"
-            f"[red]Rows removed:[/red] {df.shape[0] - cleaned.shape[0]} (impossible age/salary values)\n"
+            f"[green]Cleaned dataset:[/green] {clean_df.shape[0]} rows x {clean_df.shape[1]} columns\n"
+            f"[red]Rows removed:[/red] {df.shape[0] - clean_df.shape[0]} (impossible age/salary values)\n"
             f"[yellow]Age threshold:[/yellow] [{AGE_MIN}, {AGE_MAX}]\n"
             f"[yellow]Salary threshold:[/yellow] (0, {SALARY_MAX:,}]",
             title="Cleaning Summary",

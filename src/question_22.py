@@ -1,27 +1,14 @@
 """Q22. Contradiction Analysis."""
 
-import joblib
 import pandas as pd
 from rich.panel import Panel
 from rich.table import Table
 
-from question_01 import clean, console, load_raw
-from question_05 import MODEL_PATH, ModelArtifacts
-from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
-from question_18 import LASSO_PATH, LassoArtifacts
+from question_01 import console, get_clean_df
+from question_05 import get_model_artifacts
+from question_12 import get_complete_cluster_artifacts
+from question_18 import get_lasso_artifacts
 from question_21 import build_master_frame, get_flight_risk_ids
-
-
-def load_model_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
-
-
-def load_cluster_artifacts() -> CompleteLinkageArtifacts:
-    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
 
 
 def identify_contradictions(master: pd.DataFrame, flight_risk_ids: set[str]) -> pd.DataFrame:
@@ -92,7 +79,7 @@ def report_contradiction_summary(contradictions: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    clean_df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
@@ -101,15 +88,15 @@ def main() -> None:
         ),
     )
 
-    model_artifacts = load_model_artifacts()
-    cluster_artifacts = load_cluster_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
+    model_artifacts = get_model_artifacts()
+    cluster_artifacts = get_complete_cluster_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
 
     flight_risk_ids = get_flight_risk_ids(cluster_artifacts)
-    master = build_master_frame(clean_df, model_artifacts, lasso_artifacts)
+    master = build_master_frame(df, model_artifacts, lasso_artifacts)
 
     master = master.merge(
-        clean_df[["Employee_ID", "Attrition"]].assign(Employee_ID=lambda frame: frame["Employee_ID"].astype(str)),
+        df[["Employee_ID", "Attrition"]].assign(Employee_ID=lambda frame: frame["Employee_ID"].astype(str)),
         on="Employee_ID",
         how="left",
     )

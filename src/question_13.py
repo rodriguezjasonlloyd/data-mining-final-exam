@@ -1,6 +1,5 @@
 """Q13. Cluster Profiling."""
 
-import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -8,7 +7,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console
-from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_12 import CompleteLinkageArtifacts, get_complete_cluster_artifacts
 
 BOX_PLOT_FEATURES = [
     "Monthly_Salary_PHP",
@@ -32,10 +31,6 @@ CLUSTER_INTERVENTIONS: dict[int, str] = {
     1: "Individual case review — investigate anomalous profiles",
     2: "Urgent re-engagement: satisfaction surveys, salary review, workload audit",
 }
-
-
-def load_artifacts() -> CompleteLinkageArtifacts:
-    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
 
 
 def build_profile_frame(artifacts: CompleteLinkageArtifacts) -> pd.DataFrame:
@@ -126,7 +121,7 @@ def plot_box_plots(profile: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_complete_cluster_artifacts()
     profile = build_profile_frame(artifacts)
 
     console.print(

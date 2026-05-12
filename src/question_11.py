@@ -1,6 +1,7 @@
 """Q11. Agglomerative Hierarchical Clustering."""
 
-import joblib
+from functools import cache
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from pydantic import BaseModel
@@ -10,15 +11,32 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.model_selection import train_test_split
 
-from question_01 import clean, console, load_raw
-from question_10 import SCALER_PATH, ScalerArtifacts
+from question_01 import console, get_clean_df
+from question_10 import ScalerArtifacts, get_scaler_artifacts
 
 SAMPLE_SIZE = 300
 RANDOM_STATE = 42
 LINKAGE_METHOD = "average"
 DISTANCE_METRIC = "euclidean"
 NUM_CLUSTERS = 3
-CLUSTER_PATH = "clusters_average.joblib"
+
+
+@cache
+def get_cluster_artifacts() -> ClusterArtifacts:
+    df = get_clean_df()
+    scaler_artifacts = get_scaler_artifacts()
+
+    sample_df, scaled_sample = sample_employees(df, scaler_artifacts)
+    cluster_labels, linkage_matrix = cluster(scaled_sample)
+
+    return ClusterArtifacts(
+        sample_df=sample_df,
+        scaled_sample=scaled_sample,
+        cluster_labels=cluster_labels,
+        linkage_matrix=linkage_matrix,
+        num_clusters=NUM_CLUSTERS,
+        linkage_method=LINKAGE_METHOD,
+    )
 
 
 class ClusterArtifacts(BaseModel):
@@ -30,10 +48,6 @@ class ClusterArtifacts(BaseModel):
     linkage_matrix: list[list[float]]
     num_clusters: int
     linkage_method: str
-
-
-def load_scaler_artifacts() -> ScalerArtifacts:
-    return ScalerArtifacts(**joblib.load(SCALER_PATH))
 
 
 def sample_employees(df: pd.DataFrame, scaler_artifacts: ScalerArtifacts) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -116,8 +130,8 @@ def plot_dendrogram(linkage_matrix: list[list[float]]) -> None:
 
 
 def main() -> None:
-    df = clean(load_raw())
-    scaler_artifacts = load_scaler_artifacts()
+    df = get_clean_df()
+    scaler_artifacts = get_scaler_artifacts()
 
     console.print(
         Panel(
@@ -135,18 +149,6 @@ def main() -> None:
 
     report_clusters(sample_df, cluster_labels)
     plot_dendrogram(linkage_matrix)
-
-    artifacts = ClusterArtifacts(
-        sample_df=sample_df,
-        scaled_sample=scaled_sample,
-        cluster_labels=cluster_labels,
-        linkage_matrix=linkage_matrix,
-        num_clusters=NUM_CLUSTERS,
-        linkage_method=LINKAGE_METHOD,
-    )
-
-    joblib.dump(artifacts.model_dump(), CLUSTER_PATH)
-    console.print(f"[dim]Cluster artifacts saved to {CLUSTER_PATH}[/dim]")
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import seaborn as sns
 from rich.panel import Panel
 from rich.table import Table
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
 
 def compute_attrition_rate(df: pd.DataFrame, by: str) -> pd.DataFrame:
@@ -49,7 +49,7 @@ def plot_attrition(df: pd.DataFrame, by: str) -> None:
 
 
 def main() -> None:
-    df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(

@@ -1,6 +1,5 @@
 """Q14. Cluster and Attrition Analysis."""
 
-import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -9,14 +8,10 @@ from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console
-from question_12 import COMPLETE_CLUSTER_PATH, CompleteLinkageArtifacts
+from question_12 import CompleteLinkageArtifacts, get_complete_cluster_artifacts
 from question_13 import CLUSTER_NAMES
 
 ATTRITION_LABELS: dict[int, str] = {0: "Stayed", 1: "Left"}
-
-
-def load_artifacts() -> CompleteLinkageArtifacts:
-    return CompleteLinkageArtifacts(**joblib.load(COMPLETE_CLUSTER_PATH))
 
 
 def build_analysis_frame(artifacts: CompleteLinkageArtifacts) -> pd.DataFrame:
@@ -132,7 +127,7 @@ def plot_attrition_rate_by_cluster(frame: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    artifacts = load_artifacts()
+    artifacts = get_complete_cluster_artifacts()
     frame = build_analysis_frame(artifacts)
 
     console.print(

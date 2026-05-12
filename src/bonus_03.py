@@ -1,6 +1,5 @@
 """Bonus 3. Feature Engineering and Model Improvement."""
 
-import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,11 +12,10 @@ from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_sco
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-from question_01 import clean, console, load_raw
-from question_05 import DROP_COLUMNS, MODEL_PATH, ModelArtifacts, encode
-from question_15 import OLS_PATH, OLSArtifacts
-from question_17 import RIDGE_PATH, RidgeArtifacts
-from question_18 import LASSO_PATH, LassoArtifacts
+from question_01 import console, get_clean_df
+from question_05 import DROP_COLUMNS, encode
+from question_17 import RidgeArtifacts, get_ridge_artifacts
+from question_18 import LassoArtifacts, get_lasso_artifacts
 
 ENGINEERED_FEATURES: list[str] = [
     "salary_per_tenure",
@@ -48,22 +46,6 @@ class RegressionComparison(BaseModel):
     engineered_test_r2: float
     engineered_test_rmse: float
     engineered_nonzero: int
-
-
-def load_model_artifacts() -> ModelArtifacts:
-    return ModelArtifacts(**joblib.load(MODEL_PATH))
-
-
-def load_ols_artifacts() -> OLSArtifacts:
-    return OLSArtifacts(**joblib.load(OLS_PATH))
-
-
-def load_ridge_artifacts() -> RidgeArtifacts:
-    return RidgeArtifacts(**joblib.load(RIDGE_PATH))
-
-
-def load_lasso_artifacts() -> LassoArtifacts:
-    return LassoArtifacts(**joblib.load(LASSO_PATH))
 
 
 def engineer(df: pd.DataFrame) -> pd.DataFrame:
@@ -340,11 +322,11 @@ def plot_regression_comparison(comparisons: list[RegressionComparison]) -> None:
 
 
 def main() -> None:
-    df_baseline = clean(load_raw())
+    df_baseline = get_clean_df()
     df_engineered = engineer(df_baseline)
 
-    ridge_artifacts = load_ridge_artifacts()
-    lasso_artifacts = load_lasso_artifacts()
+    ridge_artifacts = get_ridge_artifacts()
+    lasso_artifacts = get_lasso_artifacts()
 
     console.print(
         Panel(

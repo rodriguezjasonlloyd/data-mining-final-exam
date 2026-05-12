@@ -1,6 +1,7 @@
 """Q5. Build a Decision Tree Classifier."""
 
-import joblib
+from functools import cache
+
 import pandas as pd
 from pydantic import BaseModel
 from rich.panel import Panel
@@ -9,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 
-from question_01 import clean, console, load_raw
+from question_01 import console, get_clean_df
 
 CATEGORICAL_COLUMNS = [
     "Gender",
@@ -28,7 +29,13 @@ DROP_COLUMNS = [
     "Attrition",
 ]
 
-MODEL_PATH = "model.joblib"
+_model_artifacts: ModelArtifacts | None = None
+
+
+@cache
+def get_model_artifacts() -> ModelArtifacts:
+    x, y = prepare(get_clean_df())
+    return train(x, y)
 
 
 class ModelArtifacts(BaseModel):
@@ -81,7 +88,7 @@ def report_tree(artifacts: ModelArtifacts) -> None:
 
 
 def main() -> None:
-    df = clean(load_raw())
+    df = get_clean_df()
 
     console.print(
         Panel(
@@ -90,20 +97,16 @@ def main() -> None:
         ),
     )
 
-    x, y = prepare(df)
-    artifacts = train(x, y)
+    model_artifacts = get_model_artifacts()
 
-    report_tree(artifacts)
+    report_tree(model_artifacts)
 
     console.print(
         Panel(
-            f"[bold]Train:[/bold] {artifacts.x_train.shape[0]} samples\n[bold]Test:[/bold] {artifacts.x_test.shape[0]} samples\n[bold]Features:[/bold] {artifacts.x_train.shape[1]}",
+            f"[bold]Train:[/bold] {model_artifacts.x_train.shape[0]} samples\n[bold]Test:[/bold] {model_artifacts.x_test.shape[0]} samples\n[bold]Features:[/bold] {model_artifacts.x_train.shape[1]}",
             title="Train/Test Split (70/30)",
         ),
     )
-
-    joblib.dump(artifacts.model_dump(), MODEL_PATH)
-    console.print(f"[dim]Model and splits saved to {MODEL_PATH}[/dim]")
 
 
 if __name__ == "__main__":

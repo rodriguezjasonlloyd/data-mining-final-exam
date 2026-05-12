@@ -1,6 +1,7 @@
 """Q12. Linkage Method Comparison."""
 
-import joblib
+from functools import cache
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from pydantic import BaseModel
@@ -10,12 +11,15 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
 
 from question_01 import console
-from question_10 import SCALER_PATH, ScalerArtifacts
-from question_11 import CLUSTER_PATH, NUM_CLUSTERS, SAMPLE_SIZE, ClusterArtifacts
+from question_11 import NUM_CLUSTERS, SAMPLE_SIZE, ClusterArtifacts, get_cluster_artifacts
 
 COMPLETE_LINKAGE_METHOD = "complete"
 DISTANCE_METRIC = "euclidean"
-COMPLETE_CLUSTER_PATH = "clusters_complete.joblib"
+
+
+@cache
+def get_complete_cluster_artifacts() -> CompleteLinkageArtifacts:
+    return cluster_complete(get_cluster_artifacts())
 
 
 class CompleteLinkageArtifacts(BaseModel):
@@ -27,12 +31,6 @@ class CompleteLinkageArtifacts(BaseModel):
     linkage_matrix: list[list[float]]
     num_clusters: int
     linkage_method: str
-
-
-def load_artifacts() -> tuple[ClusterArtifacts, ScalerArtifacts]:
-    average_artifacts = ClusterArtifacts(**joblib.load(CLUSTER_PATH))
-    scaler_artifacts = ScalerArtifacts(**joblib.load(SCALER_PATH))
-    return average_artifacts, scaler_artifacts
 
 
 def cluster_complete(average_artifacts: ClusterArtifacts) -> CompleteLinkageArtifacts:
@@ -162,7 +160,7 @@ def plot_dendrograms(average_artifacts: ClusterArtifacts, complete_artifacts: Co
 
 
 def main() -> None:
-    average_artifacts, _scaler_artifacts = load_artifacts()
+    average_artifacts = get_cluster_artifacts()
 
     console.print(
         Panel(
@@ -174,12 +172,9 @@ def main() -> None:
         ),
     )
 
-    complete_artifacts = cluster_complete(average_artifacts)
-    report_comparison(average_artifacts, complete_artifacts)
-    plot_dendrograms(average_artifacts, complete_artifacts)
-
-    joblib.dump(complete_artifacts.model_dump(), COMPLETE_CLUSTER_PATH)
-    console.print(f"[dim]Complete linkage artifacts saved to {COMPLETE_CLUSTER_PATH}[/dim]")
+    complete_cluster_artifacts = get_complete_cluster_artifacts()
+    report_comparison(average_artifacts, complete_cluster_artifacts)
+    plot_dendrograms(average_artifacts, complete_cluster_artifacts)
 
 
 if __name__ == "__main__":
