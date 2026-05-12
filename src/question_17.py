@@ -20,11 +20,6 @@ ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 CV_FOLDS = 5
 
 
-@cache
-def get_ridge_artifacts() -> RidgeArtifacts:
-    return train_ridge(get_ols_artifacts())
-
-
 class RidgeArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -35,6 +30,11 @@ class RidgeArtifacts(BaseModel):
     test_r2: float
     train_rmse: float
     test_rmse: float
+
+
+@cache
+def get_ridge_artifacts() -> RidgeArtifacts:
+    return train_ridge(get_ols_artifacts())
 
 
 def train_ridge(ols_artifacts: OLSArtifacts) -> RidgeArtifacts:

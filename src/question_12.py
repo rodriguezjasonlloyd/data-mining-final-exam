@@ -17,11 +17,6 @@ COMPLETE_LINKAGE_METHOD = "complete"
 DISTANCE_METRIC = "euclidean"
 
 
-@cache
-def get_complete_cluster_artifacts() -> CompleteLinkageArtifacts:
-    return cluster_complete(get_cluster_artifacts())
-
-
 class CompleteLinkageArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -31,6 +26,11 @@ class CompleteLinkageArtifacts(BaseModel):
     linkage_matrix: list[list[float]]
     num_clusters: int
     linkage_method: str
+
+
+@cache
+def get_complete_cluster_artifacts() -> CompleteLinkageArtifacts:
+    return cluster_complete(get_cluster_artifacts())
 
 
 def cluster_complete(average_artifacts: ClusterArtifacts) -> CompleteLinkageArtifacts:

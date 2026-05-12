@@ -29,14 +29,6 @@ ATTRITION_DROP_COLUMNS = [
     "Attrition",
 ]
 
-_model_artifacts: ModelArtifacts | None = None
-
-
-@cache
-def get_model_artifacts() -> ModelArtifacts:
-    x, y = prepare(get_clean_df())
-    return train(x, y)
-
 
 class ModelArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
@@ -48,6 +40,12 @@ class ModelArtifacts(BaseModel):
     y_test: pd.Series
 
 
+@cache
+def get_model_artifacts() -> ModelArtifacts:
+    x, y = prepare_attrition(get_clean_df())
+    return train(x, y)
+
+
 def encode(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
     encoder = LabelEncoder()
@@ -57,7 +55,7 @@ def encode(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+def prepare_attrition(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     encoded = encode(df)
     x = encoded.drop(columns=ATTRITION_DROP_COLUMNS)
     y = encoded["Attrition"]

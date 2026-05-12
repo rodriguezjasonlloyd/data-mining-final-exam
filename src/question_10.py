@@ -23,11 +23,6 @@ CLUSTERING_FEATURES = [
 ]
 
 
-@cache
-def get_scaler_artifacts() -> ScalerArtifacts:
-    return standardize(get_clean_df())
-
-
 class ScalerArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -35,6 +30,11 @@ class ScalerArtifacts(BaseModel):
     scaled_features: np.ndarray
     feature_names: list[str]
     employee_ids: pd.Series
+
+
+@cache
+def get_scaler_artifacts() -> ScalerArtifacts:
+    return standardize(get_clean_df())
 
 
 def standardize(df: pd.DataFrame) -> ScalerArtifacts:

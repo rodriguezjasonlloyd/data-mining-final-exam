@@ -23,11 +23,6 @@ L1_RATIO_GRID: list[float] = [0.1, 0.25, 0.5, 0.75, 0.9]
 CV_FOLDS = 5
 
 
-@cache
-def get_elastic_net_artifacts() -> ElasticNetArtifacts:
-    return train_elastic_net(get_ols_artifacts())
-
-
 class ElasticNetArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -40,6 +35,11 @@ class ElasticNetArtifacts(BaseModel):
     train_rmse: float
     test_rmse: float
     nonzero_count: int
+
+
+@cache
+def get_elastic_net_artifacts() -> ElasticNetArtifacts:
+    return train_elastic_net(get_ols_artifacts())
 
 
 def train_elastic_net(ols_artifacts: OLSArtifacts) -> ElasticNetArtifacts:

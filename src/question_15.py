@@ -20,12 +20,6 @@ SALARY_DROP_COLUMNS = ["Employee_ID", "Hire_Date", "Monthly_Salary_PHP", "Attrit
 TARGET_COLUMN = "Monthly_Salary_PHP"
 
 
-@cache
-def get_ols_artifacts() -> OLSArtifacts:
-    x, y = prepare(get_clean_df())
-    return train_ols(x, y)
-
-
 class OLSArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -37,6 +31,12 @@ class OLSArtifacts(BaseModel):
     feature_names: list[str]
 
 
+@cache
+def get_ols_artifacts() -> OLSArtifacts:
+    x, y = prepare_salary(get_clean_df())
+    return train_ols(x, y)
+
+
 def encode(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
     encoder = LabelEncoder()
@@ -46,7 +46,7 @@ def encode(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+def prepare_salary(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     encoded = encode(df)
     x = encoded.drop(columns=SALARY_DROP_COLUMNS)
     y = encoded[TARGET_COLUMN]

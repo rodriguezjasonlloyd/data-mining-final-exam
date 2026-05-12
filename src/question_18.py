@@ -20,11 +20,6 @@ ALPHA_GRID: list[float] = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
 CV_FOLDS = 5
 
 
-@cache
-def get_lasso_artifacts() -> LassoArtifacts:
-    return train_lasso(get_ols_artifacts())
-
-
 class LassoArtifacts(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
@@ -36,6 +31,11 @@ class LassoArtifacts(BaseModel):
     train_rmse: float
     test_rmse: float
     nonzero_count: int
+
+
+@cache
+def get_lasso_artifacts() -> LassoArtifacts:
+    return train_lasso(get_ols_artifacts())
 
 
 def train_lasso(ols_artifacts: OLSArtifacts) -> LassoArtifacts:

@@ -21,6 +21,17 @@ DISTANCE_METRIC = "euclidean"
 NUM_CLUSTERS = 3
 
 
+class ClusterArtifacts(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
+    sample_df: pd.DataFrame
+    scaled_sample: pd.DataFrame
+    cluster_labels: pd.Series
+    linkage_matrix: list[list[float]]
+    num_clusters: int
+    linkage_method: str
+
+
 @cache
 def get_cluster_artifacts() -> ClusterArtifacts:
     df = get_clean_df()
@@ -37,17 +48,6 @@ def get_cluster_artifacts() -> ClusterArtifacts:
         num_clusters=NUM_CLUSTERS,
         linkage_method=LINKAGE_METHOD,
     )
-
-
-class ClusterArtifacts(BaseModel):
-    model_config = {"arbitrary_types_allowed": True}
-
-    sample_df: pd.DataFrame
-    scaled_sample: pd.DataFrame
-    cluster_labels: pd.Series
-    linkage_matrix: list[list[float]]
-    num_clusters: int
-    linkage_method: str
 
 
 def sample_employees(df: pd.DataFrame, scaler_artifacts: ScalerArtifacts) -> tuple[pd.DataFrame, pd.DataFrame]:
