@@ -1,0 +1,5 @@
+[tools]
+"aqua:astral-sh/ruff" = "latest"
+"aqua:astral-sh/ty" = "latest"
+"aqua:astral-sh/uv" = "latest"
+"aqua:tombi-toml/tombi" = "latest"
