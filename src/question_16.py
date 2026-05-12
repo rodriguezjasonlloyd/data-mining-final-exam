@@ -1,3 +1,5 @@
+"""Q16. Multicollinearity and VIF."""
+
 import joblib
 import pandas as pd
 import statsmodels.api as sm

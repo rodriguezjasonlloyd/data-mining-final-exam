@@ -1,3 +1,5 @@
+"""Q23. Recommendation for the CHRO."""
+
 import joblib
 import numpy as np
 import pandas as pd

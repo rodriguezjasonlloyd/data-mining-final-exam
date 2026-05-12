@@ -1,3 +1,5 @@
+"""Q22. Contradiction Analysis."""
+
 import joblib
 import pandas as pd
 from rich.panel import Panel

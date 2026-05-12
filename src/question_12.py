@@ -1,3 +1,5 @@
+"""Q12. Linkage Method Comparison."""
+
 import joblib
 import matplotlib.pyplot as plt
 import pandas as pd

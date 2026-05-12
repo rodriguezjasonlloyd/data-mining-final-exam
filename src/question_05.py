@@ -1,3 +1,5 @@
+"""Q5. Build a Decision Tree Classifier."""
+
 import joblib
 import pandas as pd
 from pydantic import BaseModel

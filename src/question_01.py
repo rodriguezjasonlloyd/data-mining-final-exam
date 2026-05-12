@@ -1,3 +1,5 @@
+"""Q1. Data Quality Assessment."""
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
