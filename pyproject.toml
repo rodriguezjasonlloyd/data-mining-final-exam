@@ -18,7 +18,7 @@ dependencies = [
 line-length = 200
 
 [tool.ruff.lint]
-ignore = ["D10", "E501", "PLR2004", "TC002"]
+ignore = ["D10", "E501", "PLR0913", "PLR2004", "TC002"]
 select = [
   "A",
   "ANN",
