@@ -59,6 +59,32 @@ DEPARTMENT_MAP: dict[str, str] = {
     "Compliance": "Compliance",
 }
 
+NUMERIC_IMPUTE_COLUMNS = [
+    "Age",
+    "Monthly_Salary_PHP",
+    "Tenure_Years",
+    "Performance_Score",
+    "Training_Hours_YTD",
+    "Absences_YTD",
+    "Overtime_Hours_Monthly",
+    "Distance_Office_KM",
+    "Job_Satisfaction_Score",
+    "Work_Life_Balance_Score",
+    "Num_Promotions",
+    "Prev_Companies",
+]
+
+CATEGORICAL_IMPUTE_COLUMNS = [
+    "Gender",
+    "Marital_Status",
+    "Region",
+    "Education_Level",
+    "Department",
+    "Employment_Type",
+    "Shift",
+    "Performance_Rating",
+]
+
 
 def load_raw() -> pd.DataFrame:
     return pd.read_csv("data.csv")
@@ -66,8 +92,11 @@ def load_raw() -> pd.DataFrame:
 
 def check_missing(df: pd.DataFrame) -> pd.DataFrame:
     missing = df.isna().sum()
-    pct = (missing / len(df) * 100).round(2)
-    return pd.DataFrame({"missing_count": missing, "missing_pct": pct}).query("missing_count > 0").sort_values("missing_pct", ascending=False)
+    return (
+        pd.DataFrame({"missing_count": missing, "missing_percentage": (missing / len(df) * 100).round(2)})
+        .query("missing_count > 0")
+        .sort_values("missing_percentage", ascending=False)
+    )
 
 
 def check_suspicious_numerics(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -87,8 +116,8 @@ def check_department_names(df: pd.DataFrame) -> pd.Series:
 
 
 def check_categorical_values(df: pd.DataFrame) -> dict[str, pd.Series]:
-    cats = ["Gender", "Marital_Status", "Education_Level", "Employment_Type", "Shift", "Performance_Rating"]
-    return {column: df[column].value_counts(dropna=False) for column in cats if column in df.columns}
+    categories = ["Gender", "Marital_Status", "Education_Level", "Employment_Type", "Shift", "Performance_Rating"]
+    return {column: df[column].value_counts(dropna=False) for column in categories if column in df.columns}
 
 
 def get_dropped_rows(df: pd.DataFrame) -> pd.DataFrame:
@@ -114,35 +143,11 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     result["Absences_YTD"] = result["Absences_YTD"].clip(lower=0)
     result["Tenure_Years"] = result["Tenure_Years"].clip(lower=0)
 
-    numeric_columns = [
-        "Age",
-        "Monthly_Salary_PHP",
-        "Tenure_Years",
-        "Performance_Score",
-        "Training_Hours_YTD",
-        "Absences_YTD",
-        "Overtime_Hours_Monthly",
-        "Distance_Office_KM",
-        "Job_Satisfaction_Score",
-        "Work_Life_Balance_Score",
-        "Num_Promotions",
-        "Prev_Companies",
-    ]
-    for column in numeric_columns:
+    for column in NUMERIC_IMPUTE_COLUMNS:
         if column in result.columns:
             result[column] = result[column].fillna(result[column].median())
 
-    categorical_columns = [
-        "Gender",
-        "Marital_Status",
-        "Region",
-        "Education_Level",
-        "Department",
-        "Employment_Type",
-        "Shift",
-        "Performance_Rating",
-    ]
-    for column in categorical_columns:
+    for column in CATEGORICAL_IMPUTE_COLUMNS:
         if column in result.columns:
             result[column] = result[column].fillna(result[column].mode()[0])
 
@@ -156,9 +161,9 @@ def report_missing(missing_df: pd.DataFrame) -> None:
     table.add_column("Missing %", justify="right")
 
     for column, row in missing_df.iterrows():
-        pct = row["missing_pct"]
-        color = "bright_red" if pct > 5 else "bright_yellow" if pct > 2 else "bright_green"
-        table.add_row(str(column), str(int(row["missing_count"])), f"[{color}]{pct:.2f}%[/{color}]")
+        percentage = row["missing_percentage"]
+        color = "bright_red" if percentage > 5 else "bright_yellow" if percentage > 2 else "bright_green"
+        table.add_row(str(column), str(int(row["missing_count"])), f"[{color}]{percentage:.2f}%[/{color}]")
 
     console.print(table)
 
@@ -238,13 +243,55 @@ def report_categoricals(cats: dict[str, pd.Series]) -> None:
         console.print(table)
 
 
+def report_imputation(raw_df: pd.DataFrame, clean_df: pd.DataFrame) -> None:
+    missing_raw = raw_df.isna().sum()
+    missing_clean = clean_df.isna().sum()
+
+    imputed_columns = missing_raw[missing_raw > 0].index.tolist()
+    if not imputed_columns:
+        console.print("[bright_green]No missing values required imputation.[/bright_green]")
+        return
+
+    table = Table(title="Missing Value Imputation Summary", show_lines=True)
+    table.add_column("Column", style="bright_cyan")
+    table.add_column("Missing (raw)", justify="right")
+    table.add_column("Missing (clean)", justify="right")
+    table.add_column("Strategy", justify="left")
+    table.add_column("Imputed Value", justify="right")
+
+    for column in imputed_columns:
+        raw_count: int = int(missing_raw[column])
+        clean_count: int = int(missing_clean.get(column, 0))
+
+        if column in NUMERIC_IMPUTE_COLUMNS:
+            strategy = "Median"
+            imputed_value = f"{raw_df[column].median():.2f}"
+        elif column in CATEGORICAL_IMPUTE_COLUMNS:
+            strategy = "Mode"
+            imputed_value = str(raw_df[column].mode()[0])
+        else:
+            strategy = "Unknown"
+            imputed_value = "—"
+
+        resolved_color = "bright_green" if clean_count == 0 else "bright_red"
+        table.add_row(
+            column,
+            str(raw_count),
+            f"[{resolved_color}]{clean_count}[/{resolved_color}]",
+            strategy,
+            imputed_value,
+        )
+
+    console.print(table)
+
+
 def plot_missing(missing_df: pd.DataFrame) -> None:
     if missing_df.empty:
         return
 
-    _fig, ax = plt.subplots(figsize=(10, 5))
+    _, ax = plt.subplots(figsize=(10, 5))
 
-    sns.barplot(data=missing_df.reset_index(), x="index", y="missing_pct", ax=ax, color="steelblue")
+    sns.barplot(data=missing_df.reset_index(), x="index", y="missing_percentage", ax=ax, color="steelblue")
     ax.set_title("Missing Values by Column (%)")
     ax.set_xlabel("Column")
     ax.set_ylabel("Missing %")
@@ -255,7 +302,7 @@ def plot_missing(missing_df: pd.DataFrame) -> None:
 
 def plot_numeric_distributions(df: pd.DataFrame) -> None:
     columns = ["Age", "Monthly_Salary_PHP", "Absences_YTD", "Tenure_Years"]
-    _fig, axes = plt.subplots(1, len(columns), figsize=(16, 4))
+    _, axes = plt.subplots(1, len(columns), figsize=(16, 4))
 
     for ax, column in zip(axes, columns, strict=False):
         if column in df.columns:
@@ -303,6 +350,8 @@ def main() -> None:
             title="Cleaning Summary",
         ),
     )
+
+    report_imputation(df, clean_df)
 
 
 if __name__ == "__main__":
