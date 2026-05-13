@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
@@ -43,7 +42,12 @@ def is_valid_combination(linkage_method: str, distance_metric: str) -> bool:
 
 
 def valid_combinations() -> list[tuple[str, str]]:
-    return [(linkage_method, distance_metric) for distance_metric in DISTANCE_METRICS for linkage_method in LINKAGE_METHODS if is_valid_combination(linkage_method, distance_metric)]
+    return [
+        (linkage_method, distance_metric)
+        for distance_metric in DISTANCE_METRICS
+        for linkage_method in LINKAGE_METHODS
+        if is_valid_combination(linkage_method, distance_metric)
+    ]
 
 
 def run_combination(
@@ -80,16 +84,6 @@ def run_combination(
     )
 
 
-def report_skipped_combinations() -> None:
-    skipped: list[tuple[str, str]] = [
-        (linkage_method, distance_metric) for distance_metric in DISTANCE_METRICS for linkage_method in LINKAGE_METHODS if not is_valid_combination(linkage_method, distance_metric)
-    ]
-    for linkage_method, distance_metric in skipped:
-        console.print(
-            f"[dim]Skipping {linkage_method.title()} + {distance_metric.title()}: Ward linkage requires squared Euclidean distance and is mathematically invalid with {distance_metric}.[/dim]",
-        )
-
-
 def report_comparison(results: list[CombinationResult]) -> None:
     table = Table(title=f"Clustering Method Comparison (n={SAMPLE_SIZE}, k={NUM_CLUSTERS})", show_lines=True)
     table.add_column("Linkage", style="bright_cyan")
@@ -114,7 +108,6 @@ def report_comparison(results: list[CombinationResult]) -> None:
         )
 
     console.print(table)
-    console.print("[dim]Balance Ratio = largest cluster / smallest cluster. Closer to 1.0 is more balanced. Silhouette Score ranges from -1 to 1; higher is better separated.[/dim]")
 
 
 def report_recommendation(results: list[CombinationResult]) -> None:
@@ -122,18 +115,15 @@ def report_recommendation(results: list[CombinationResult]) -> None:
     sizes_str: str = " / ".join(str(best.cluster_sizes[k]) for k in sorted(best.cluster_sizes))
 
     console.print(
-        Panel(
-            f"[bold]Recommended setup:[/bold] [bright_green]{best.linkage_method.title()} Linkage + {best.distance_metric.title()} Distance[/bright_green]\n\n"
-            f"[bold]Silhouette score:[/bold] {best.silhouette:.4f} — highest among all valid combinations, "
-            f"indicating the most cohesive and well-separated clusters.\n\n"
-            f"[bold]Balance ratio:[/bold] {best.balance_ratio:.2f} — cluster sizes ({sizes_str}) are "
-            f"{'well-balanced, reducing bias toward the dominant cluster' if best.balance_ratio < 2.0 else 'moderately unbalanced but acceptable for HR segmentation'}.\n\n"
-            f"[bold]HR rationale:[/bold] A higher silhouette score means employees within each cluster are more "
-            f"similar to each other than to those in other clusters — making cluster-specific HR interventions "
-            f"more targeted and actionable. Ward linkage minimizes within-cluster variance at each merge step, "
-            f"which naturally produces compact, interpretable groups suitable for HR profiling.",
-            title="Bonus 2 — Recommended Clustering Setup",
-        ),
+        f"[bold]Recommended setup:[/bold] [bright_green]{best.linkage_method.title()} Linkage + {best.distance_metric.title()} Distance[/bright_green]\n"
+        f"[bold]Silhouette score:[/bold] {best.silhouette:.4f} — highest among all valid combinations, "
+        f"indicating the most cohesive and well-separated clusters.\n"
+        f"[bold]Balance ratio:[/bold] {best.balance_ratio:.2f} — cluster sizes ({sizes_str}) are "
+        f"{'well-balanced, reducing bias toward the dominant cluster' if best.balance_ratio < 2.0 else 'moderately unbalanced but acceptable for HR segmentation'}.\n"
+        f"[bold]HR rationale:[/bold] A higher silhouette score means employees within each cluster are more "
+        f"similar to each other than to those in other clusters — making cluster-specific HR interventions "
+        f"more targeted and actionable. Ward linkage minimizes within-cluster variance at each merge step, "
+        f"which naturally produces compact, interpretable groups suitable for HR profiling.",
     )
 
 
@@ -178,17 +168,7 @@ def main() -> None:
 
     combinations = valid_combinations()
 
-    console.print(
-        Panel(
-            f"[bold]Sample size:[/bold] {SAMPLE_SIZE}  "
-            f"[bold]Clusters:[/bold] {NUM_CLUSTERS}  "
-            f"[bold]Valid combinations:[/bold] {len(combinations)}\n"
-            f"[dim]Ward + Manhattan is skipped (Ward requires squared Euclidean distance).[/dim]",
-            title="Workforce Attrition — Bonus 2: Clustering Comparison Analysis",
-        ),
-    )
-
-    report_skipped_combinations()
+    console.print(f"[bold]Sample size:[/bold] {SAMPLE_SIZE}  [bold]Clusters:[/bold] {NUM_CLUSTERS}  [bold]Valid combinations:[/bold] {len(combinations)}\n")
 
     results: list[CombinationResult] = []
     for linkage_method, distance_metric in combinations:

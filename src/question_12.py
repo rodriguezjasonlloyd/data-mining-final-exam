@@ -5,7 +5,6 @@ from functools import cache
 import matplotlib.pyplot as plt
 import pandas as pd
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
@@ -119,21 +118,21 @@ def report_comparison(average_artifacts: ClusterArtifacts, complete_artifacts: C
         str(average_counts.tolist()),
         f"{average_balance:.3f}",
         "[bright_red]Yes[/bright_red]" if average_chaining else "[bright_green]No[/bright_green]",
-        "[bright_red]Not suitable — chaining detected[/bright_red]" if average_chaining else "[bright_green]Suitable[/bright_green]",
+        "[bright_red]Not suitable, chaining detected[/bright_red]" if average_chaining else "[bright_green]Suitable[/bright_green]",
     )
     summary_table.add_row(
         "Complete",
         str(complete_counts.tolist()),
         f"{complete_balance:.3f}",
         "[bright_red]Yes[/bright_red]" if complete_chaining else "[bright_green]No[/bright_green]",
-        "[bright_green]More balanced separation[/bright_green]" if not complete_chaining else "[bright_red]Not suitable — chaining detected[/bright_red]",
+        "[bright_green]More balanced separation[/bright_green]" if not complete_chaining else "[bright_red]Not suitable, chaining detected[/bright_red]",
     )
 
     console.print(summary_table)
 
 
 def plot_dendrograms(average_artifacts: ClusterArtifacts, complete_artifacts: CompleteLinkageArtifacts) -> None:
-    _fig, axes = plt.subplots(1, 2, figsize=(20, 7))
+    _, axes = plt.subplots(1, 2, figsize=(20, 7))
 
     for ax, artifacts, method in zip(
         axes,
@@ -161,16 +160,6 @@ def plot_dendrograms(average_artifacts: ClusterArtifacts, complete_artifacts: Co
 
 def main() -> None:
     average_artifacts = get_cluster_artifacts()
-
-    console.print(
-        Panel(
-            f"[bold]Sample size:[/bold] {SAMPLE_SIZE}  "
-            f"[bold]Clusters:[/bold] {NUM_CLUSTERS}  "
-            f"[bold]Distance:[/bold] {DISTANCE_METRIC}\n"
-            f"[dim]Comparing average linkage (Q11) vs complete linkage.[/dim]",
-            title="Workforce Attrition — Q12 Linkage Method Comparison",
-        ),
-    )
 
     complete_cluster_artifacts = get_complete_cluster_artifacts()
     report_comparison(average_artifacts, complete_cluster_artifacts)

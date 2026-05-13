@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console, get_clean_df
@@ -60,7 +59,7 @@ def report_skewness(skewness: pd.Series) -> None:
 
 def plot_top_skewed(df: pd.DataFrame, skewness: pd.Series) -> None:
     top3 = skewness.head(3).index.tolist()
-    _fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    _, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     for ax, column in zip(axes, top3, strict=False):
         skew_val = skewness[column]
@@ -76,13 +75,6 @@ def plot_top_skewed(df: pd.DataFrame, skewness: pd.Series) -> None:
 
 def main() -> None:
     df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns",
-            title="Workforce Attrition — Q02 Descriptive Statistics",
-        ),
-    )
 
     summary = compute_summary(df)
     skewness = compute_skewness(df)

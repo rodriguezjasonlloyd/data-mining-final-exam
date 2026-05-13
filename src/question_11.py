@@ -5,7 +5,6 @@ from functools import cache
 import matplotlib.pyplot as plt
 import pandas as pd
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
@@ -110,7 +109,7 @@ def report_clusters(sample_df: pd.DataFrame, cluster_labels: pd.Series) -> None:
 
 
 def plot_dendrogram(linkage_matrix: list[list[float]]) -> None:
-    _fig, ax = plt.subplots(figsize=(14, 6))
+    _, ax = plt.subplots(figsize=(14, 6))
 
     dendrogram(
         linkage_matrix,
@@ -133,22 +132,18 @@ def main() -> None:
     df = get_clean_df()
     scaler_artifacts = get_scaler_artifacts()
 
-    console.print(
-        Panel(
-            f"[bold]Sample size:[/bold] {SAMPLE_SIZE}  "
-            f"[bold]Linkage:[/bold] {LINKAGE_METHOD}  "
-            f"[bold]Distance:[/bold] {DISTANCE_METRIC}  "
-            f"[bold]Clusters:[/bold] {NUM_CLUSTERS}\n"
-            f"[dim]Stratified on Attrition to preserve class balance.[/dim]",
-            title="Workforce Attrition — Q11 Hierarchical Clustering",
-        ),
-    )
-
     sample_df, scaled_sample = sample_employees(df, scaler_artifacts)
     cluster_labels, linkage_matrix = cluster(scaled_sample)
 
     report_clusters(sample_df, cluster_labels)
     plot_dendrogram(linkage_matrix)
+
+    console.print(
+        f"[bold]Sample size:[/bold] {SAMPLE_SIZE}  "
+        f"[bold]Linkage:[/bold] {LINKAGE_METHOD}  "
+        f"[bold]Distance:[/bold] {DISTANCE_METRIC}  "
+        f"[bold]Clusters:[/bold] {NUM_CLUSTERS}\n",
+    )
 
 
 if __name__ == "__main__":

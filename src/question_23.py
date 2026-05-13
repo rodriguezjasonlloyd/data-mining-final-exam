@@ -2,8 +2,6 @@
 
 import numpy as np
 import pandas as pd
-from rich.panel import Panel
-from rich.rule import Rule
 from rich.table import Table
 from sklearn.metrics import accuracy_score
 
@@ -173,18 +171,11 @@ See cluster intervention table above. Priority order for HR resource allocation:
 The Lasso regression explains [bright_green]{lasso_artifacts.test_r2:.1%}[/bright_green] of salary variance, indicating that a substantial portion of compensation is driven by factors not captured in the dataset (e.g., negotiation history, market timing, role seniority within grade). Salary benchmarking results should be reviewed alongside job-level compensation bands before acting on individual cases.
 """
 
-    console.print(Panel(recommendation.strip(), title="Q23 — CHRO Management Recommendation"))
+    console.print(recommendation.strip())
 
 
 def main() -> None:
     df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Dataset:[/bold] {len(df):,} employees over 15 years\n[bold]Models:[/bold] Decision Tree · Hierarchical Clustering · Lasso Regression",
-            title="Workforce Attrition — Q23 CHRO Recommendation Report",
-        ),
-    )
 
     model_artifacts = get_model_artifacts()
     cluster_artifacts = get_complete_cluster_artifacts()
@@ -196,16 +187,12 @@ def main() -> None:
     master = build_master_frame(df, model_artifacts, lasso_artifacts)
     master["Employee_ID"] = master["Employee_ID"].astype(str)
 
-    console.print(Rule("Model Performance"))
     report_model_performance(dt_accuracy, lasso_artifacts)
-
-    console.print(Rule("Cluster Profiles and Interventions"))
+    console.print()
     report_cluster_interventions(cluster_summary)
-
-    console.print(Rule("Salary Fairness"))
+    console.print()
     report_salary_fairness(master, flight_risk_ids)
-
-    console.print(Rule("CHRO Recommendation"))
+    console.print()
     report_chro_recommendation(cluster_summary, master, flight_risk_ids, dt_accuracy, lasso_artifacts)
 
 

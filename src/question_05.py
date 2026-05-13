@@ -4,7 +4,6 @@ from functools import cache
 
 import pandas as pd
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -86,24 +85,14 @@ def report_tree(artifacts: ModelArtifacts) -> None:
 
 
 def main() -> None:
-    df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns",
-            title="Workforce Attrition — Q05 Decision Tree Classifier",
-        ),
-    )
-
     model_artifacts = get_model_artifacts()
 
     report_tree(model_artifacts)
 
     console.print(
-        Panel(
-            f"[bold]Train:[/bold] {model_artifacts.x_train.shape[0]} samples\n[bold]Test:[/bold] {model_artifacts.x_test.shape[0]} samples\n[bold]Features:[/bold] {model_artifacts.x_train.shape[1]}",
-            title="Train/Test Split (70/30)",
-        ),
+        f"[bold]Train:[/bold] {model_artifacts.x_train.shape[0]} samples\n"
+        f"[bold]Test:[/bold] {model_artifacts.x_test.shape[0]} samples\n"
+        f"[bold]Features:[/bold] {model_artifacts.x_train.shape[1]}",
     )
 
 

@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console
@@ -93,7 +92,7 @@ def plot_box_plots(profile: pd.DataFrame) -> None:
     num_cols = 2
     num_rows = (num_features + 1) // num_cols
 
-    _fig, axes = plt.subplots(num_rows, num_cols, figsize=(14, num_rows * 4))
+    _, axes = plt.subplots(num_rows, num_cols, figsize=(14, num_rows * 4))
     axes_flat = axes.flatten()
 
     for index, feature in enumerate(BOX_PLOT_FEATURES):
@@ -123,13 +122,6 @@ def plot_box_plots(profile: pd.DataFrame) -> None:
 def main() -> None:
     artifacts = get_complete_cluster_artifacts()
     profile = build_profile_frame(artifacts)
-
-    console.print(
-        Panel(
-            f"[bold]Clusters:[/bold] {profile['Cluster'].nunique()}  [bold]Sample size:[/bold] {len(profile)}  [bold]Linkage:[/bold] complete",
-            title="Workforce Attrition — Q13 Cluster Profiling",
-        ),
-    )
 
     report_cluster_profiles(profile)
     report_interventions(profile)

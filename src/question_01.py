@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 
 console = Console()
@@ -317,13 +316,6 @@ def plot_numeric_distributions(df: pd.DataFrame) -> None:
 def main() -> None:
     df = load_raw()
 
-    console.print(
-        Panel(
-            f"[bold]Raw dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns",
-            title="Workforce Attrition — Q01 Data Quality",
-        ),
-    )
-
     missing_df = check_missing(df)
     suspicious = check_suspicious_numerics(df)
     dept = check_department_names(df)
@@ -336,22 +328,20 @@ def main() -> None:
     report_departments(dept)
     report_categoricals(cats)
 
-    plot_numeric_distributions(df)
-    plot_missing(missing_df)
-
     clean_df = get_clean_df()
 
+    report_imputation(df, clean_df)
+
     console.print(
-        Panel(
-            f"[bright_green]Cleaned dataset:[/bright_green] {clean_df.shape[0]} rows x {clean_df.shape[1]} columns\n"
-            f"[bright_red]Rows removed:[/bright_red] {df.shape[0] - clean_df.shape[0]} (impossible age/salary values)\n"
-            f"[bright_yellow]Age threshold:[/bright_yellow] [{AGE_MIN}, {AGE_MAX}]\n"
-            f"[bright_yellow]Salary threshold:[/bright_yellow] (0, {SALARY_MAX:,}]",
-            title="Cleaning Summary",
-        ),
+        f"[bold]Raw dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns\n"
+        f"[bright_green]Cleaned dataset:[/bright_green] {clean_df.shape[0]} rows x {clean_df.shape[1]} columns\n"
+        f"[bright_red]Rows removed:[/bright_red] {df.shape[0] - clean_df.shape[0]} (impossible age/salary values)\n"
+        f"[bright_yellow]Age threshold:[/bright_yellow] [{AGE_MIN}, {AGE_MAX}]\n"
+        f"[bright_yellow]Salary threshold:[/bright_yellow] (0, {SALARY_MAX:,}]",
     )
 
-    report_imputation(df, clean_df)
+    plot_numeric_distributions(df)
+    plot_missing(missing_df)
 
 
 if __name__ == "__main__":

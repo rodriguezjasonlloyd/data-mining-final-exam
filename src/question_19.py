@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.linear_model import ElasticNet
 from sklearn.metrics import mean_squared_error, r2_score
@@ -98,7 +97,7 @@ def report_metrics(elastic_net_artifacts: ElasticNetArtifacts) -> None:
 
     gap: float = elastic_net_artifacts.train_r2 - elastic_net_artifacts.test_r2
     color = "bright_red" if gap > 0.05 else "bright_green"
-    console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
+    console.print(f"[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]\n")
 
 
 def report_coefficient_comparison(
@@ -144,8 +143,7 @@ def report_coefficient_comparison(
 
     if zeroed_features:
         console.print(f"\n[bold bright_red]Elastic Net eliminated ({len(zeroed_features)}):[/bold bright_red] {', '.join(zeroed_features)}")
-    console.print(f"[bold bright_green]Retained ({len(retained_features)}):[/bold bright_green] {', '.join(retained_features)}")
-    console.print("[dim]Elastic Net blends L1 and L2 penalties — it selects features like Lasso while handling correlated predictors more stably like Ridge.[/dim]")
+    console.print(f"[bold bright_green]Retained ({len(retained_features)}):[/bold bright_green] {', '.join(retained_features)}\n")
 
 
 def report_model_comparison(
@@ -194,7 +192,7 @@ def plot_coefficient_comparison(
     )
     plot_df = pd.melt(plot_df, id_vars="Feature", var_name="Model", value_name="Coefficient")
 
-    _fig, ax = plt.subplots(figsize=(14, 7))
+    _, ax = plt.subplots(figsize=(14, 7))
     sns.barplot(
         data=plot_df,
         x="Coefficient",
@@ -204,7 +202,9 @@ def plot_coefficient_comparison(
         palette={"OLS": "steelblue", "Ridge": "gold", "Lasso": "tomato", "Elastic Net": "mediumseagreen"},
     )
     ax.axvline(x=0, color="black", linewidth=0.8, linestyle="--")
-    ax.set_title(f"Coefficient Comparison — OLS vs Ridge vs Lasso vs Elastic Net (λ={elastic_net_artifacts.optimal_alpha}, l1_ratio={elastic_net_artifacts.optimal_l1_ratio})")
+    ax.set_title(
+        f"Coefficient Comparison — OLS vs Ridge vs Lasso vs Elastic Net (λ={elastic_net_artifacts.optimal_alpha}, l1_ratio={elastic_net_artifacts.optimal_l1_ratio})",
+    )
     ax.set_xlabel("Coefficient Value")
     ax.set_ylabel("Feature")
     plt.tight_layout()
@@ -216,12 +216,7 @@ def main() -> None:
     ridge_artifacts = get_ridge_artifacts()
     lasso_artifacts = get_lasso_artifacts()
 
-    console.print(
-        Panel(
-            f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]L1 Ratio grid:[/bold] {L1_RATIO_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}",
-            title="Workforce Attrition — Q19 Elastic Net Regression",
-        ),
-    )
+    console.print(f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]L1 Ratio grid:[/bold] {L1_RATIO_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}\n")
 
     elastic_net_artifacts = get_elastic_net_artifacts()
 

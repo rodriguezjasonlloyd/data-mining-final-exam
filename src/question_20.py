@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.metrics import mean_squared_error, r2_score
 
@@ -112,45 +111,14 @@ def report_comparison_table(comparison: pd.DataFrame) -> None:
         )
 
     console.print(table)
-    console.print(f"[dim]Bold bright_green = best value. Best R²: {best_r2_model}. Best RMSE: {best_rmse_model}.[/dim]")
-
-
-def report_recommendation(comparison: pd.DataFrame) -> None:
-    best_r2_model: str = str(comparison["Test R²"].idxmax())
-    best_rmse_model: str = str(comparison["Test RMSE"].idxmin())
-    best_r2: float = float(comparison.loc[best_r2_model, "Test R²"])
-    best_rmse: float = float(comparison.loc[best_rmse_model, "Test RMSE"])
-
-    lasso_nonzero: int = int(comparison.loc["Lasso", "Non-Zero Coefficients"])
-    elastic_net_nonzero: int = int(comparison.loc["Elastic Net", "Non-Zero Coefficients"])
-    total_features: int = int(comparison["Non-Zero Coefficients"].max())
-
-    recommendation = (
-        f"[bold]Recommended model:[/bold] [bright_green]{best_r2_model}[/bright_green]\n\n"
-        f"[bold]Justification:[/bold]\n"
-        f"• [bold]{best_r2_model}[/bold] achieves the highest test R² of [bright_cyan]{best_r2:.4f}[/bright_cyan] "
-        f"and the lowest test RMSE of [bright_cyan]{best_rmse:,.2f} PHP[/bright_cyan], indicating the strongest "
-        f"out-of-sample predictive performance for monthly salary benchmarking.\n"
-        f"• Lasso reduces the model to [bright_cyan]{lasso_nonzero}[/bright_cyan] of {total_features} features, "
-        f"while Elastic Net retains [bright_cyan]{elastic_net_nonzero}[/bright_cyan] — both enable interpretable, "
-        f"parsimonious salary models suited for HR reporting.\n"
-        f"• Ridge retains all features and is preferred when multicollinearity is severe, "
-        f"but offers no automatic feature selection.\n"
-        f"• OLS is the baseline — if regularized models do not meaningfully outperform it, "
-        f"OLS remains the most interpretable choice for stakeholders.\n\n"
-        f"[bold]HR implication:[/bold] Use the recommended model to flag employees whose actual salary "
-        f"deviates significantly from the predicted value — both underpaid employees (retention risk) "
-        f"and overpaid outliers (budget risk)."
-    )
-
-    console.print(Panel(recommendation, title="Q20 — Model Recommendation for Salary Benchmarking"))
+    console.print(f"Best R²: {best_r2_model}. Best RMSE: {best_rmse_model}.")
 
 
 def plot_comparison(comparison: pd.DataFrame) -> None:
     models: list[str] = list(comparison.index)
     colors: list[str] = [MODEL_COLORS[model] for model in models]
 
-    _fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    _, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     r2_values: list[float] = [float(comparison.loc[model, "Test R²"]) for model in models]
     axes[0].bar(models, r2_values, color=colors, edgecolor="black", linewidth=0.6)
@@ -178,7 +146,7 @@ def plot_nonzero_coefficients(comparison: pd.DataFrame) -> None:
 
     plot_df = pd.DataFrame({"Model": models, "Non-Zero Coefficients": nonzero_values})
 
-    _fig, ax = plt.subplots(figsize=(8, 5))
+    _, ax = plt.subplots(figsize=(8, 5))
     sns.barplot(
         data=plot_df,
         x="Model",
@@ -204,17 +172,9 @@ def main() -> None:
     lasso_artifacts = get_lasso_artifacts()
     elastic_net_artifacts = get_elastic_net_artifacts()
 
-    console.print(
-        Panel(
-            "Comparing OLS, Ridge, Lasso, and Elastic Net on test R², test RMSE, non-zero coefficients, and optimal λ.",
-            title="Workforce Attrition — Q20 Regression Model Comparison",
-        ),
-    )
-
     comparison = build_comparison_dataframe(ols_artifacts, ridge_artifacts, lasso_artifacts, elastic_net_artifacts)
 
     report_comparison_table(comparison)
-    report_recommendation(comparison)
     plot_comparison(comparison)
     plot_nonzero_coefficients(comparison)
 

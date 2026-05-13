@@ -5,7 +5,6 @@ from functools import cache
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.preprocessing import StandardScaler
 
@@ -74,18 +73,10 @@ def report_standardization(df: pd.DataFrame, artifacts: ScalerArtifacts) -> None
         )
 
     console.print(table)
-    console.print("[dim]After z-score normalization all features have mean ≈ 0 and std ≈ 1.[/dim]")
 
 
 def main() -> None:
     df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns\n[bold]Clustering features:[/bold] {len(CLUSTERING_FEATURES)}",
-            title="Workforce Attrition — Q10 Data Standardization",
-        ),
-    )
 
     scaler_artifacts = standardize(df)
 

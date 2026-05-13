@@ -90,7 +90,7 @@ def report_metrics(lasso_artifacts: LassoArtifacts) -> None:
 
     gap: float = lasso_artifacts.train_r2 - lasso_artifacts.test_r2
     color = "bright_red" if gap > 0.05 else "bright_green"
-    console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
+    console.print(f"[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]\n")
 
 
 def report_coefficient_sparsity(ols_artifacts: OLSArtifacts, lasso_artifacts: LassoArtifacts) -> None:
@@ -123,9 +123,8 @@ def report_coefficient_sparsity(ols_artifacts: OLSArtifacts, lasso_artifacts: La
     retained_features = comparison[~comparison["Zeroed"]].index.tolist()
 
     if zeroed_features:
-        console.print(f"\n[bold bright_red]Eliminated features ({len(zeroed_features)}):[/bold bright_red] {', '.join(zeroed_features)}")
+        console.print(f"[bold bright_red]Eliminated features ({len(zeroed_features)}):[/bold bright_red] {', '.join(zeroed_features)}")
     console.print(f"[bold bright_green]Retained features ({len(retained_features)}):[/bold bright_green] {', '.join(retained_features)}")
-    console.print("[dim]Lasso's L1 penalty drives weak predictors to exactly zero, performing implicit feature selection.[/dim]")
 
 
 def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, lasso_artifacts: LassoArtifacts) -> None:
@@ -136,7 +135,7 @@ def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, lasso_artifacts: La
     plot_df = plot_df.rename(columns={"index": "Feature"})
     plot_df = pd.melt(plot_df, id_vars="Feature", var_name="Model", value_name="Coefficient")
 
-    _fig, ax = plt.subplots(figsize=(12, 7))
+    _, ax = plt.subplots(figsize=(12, 7))
     sns.barplot(
         data=plot_df,
         x="Coefficient",
@@ -163,7 +162,7 @@ def plot_lasso_path(ols_artifacts: OLSArtifacts) -> None:
         for index, feature in enumerate(ols_artifacts.feature_names):
             coefficient_paths[feature].append(model.coef_[index])
 
-    _fig, ax = plt.subplots(figsize=(12, 7))
+    _, ax = plt.subplots(figsize=(12, 7))
     for feature, path in coefficient_paths.items():
         ax.plot(np.log10(alphas), path, label=feature, linewidth=1.2)
 
@@ -180,12 +179,7 @@ def plot_lasso_path(ols_artifacts: OLSArtifacts) -> None:
 def main() -> None:
     ols_artifacts = get_ols_artifacts()
 
-    console.print(
-        Panel(
-            f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}",
-            title="Workforce Attrition — Q18 Lasso Regression",
-        ),
-    )
+    console.print(f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}\n")
 
     lasso_artifacts = get_lasso_artifacts()
     report_metrics(lasso_artifacts)

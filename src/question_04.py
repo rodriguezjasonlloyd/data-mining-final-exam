@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console, get_clean_df
@@ -40,7 +39,7 @@ def plot_attrition(df: pd.DataFrame, by: str) -> None:
     plot_df = df.copy()
     plot_df["Attrition_Label"] = plot_df["Attrition"].map({0: "Stayed", 1: "Left"})
 
-    _fig, ax = plt.subplots(figsize=(10, 5))
+    _, ax = plt.subplots(figsize=(10, 5))
     sns.countplot(data=plot_df, x=by, hue="Attrition_Label", ax=ax)
     ax.set_title(f"Attrition Count by {by}")
     ax.set_xlabel(by)
@@ -52,13 +51,6 @@ def plot_attrition(df: pd.DataFrame, by: str) -> None:
 
 def main() -> None:
     df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns",
-            title="Workforce Attrition — Q04 Attrition Frequency Analysis",
-        ),
-    )
 
     for by in ["Department", "Employment_Type"]:
         rates = compute_attrition_rate(df, by)

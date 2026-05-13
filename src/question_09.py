@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -137,12 +136,11 @@ def report_decision_path(steps: list[dict[str, str | float]]) -> None:
     console.print(table)
 
     color = "bright_red" if final_prediction == "Left" else "bright_green"
-    console.print(f"\n[bold]Final prediction:[/bold] [{color}]{final_prediction}[/{color}]")
-    console.print("[dim]Interpretation: the pruned tree traverses each split using the employee's feature values until reaching a leaf node, where the majority class determines the prediction.[/dim]")
+    console.print(f"[bold]Final prediction:[/bold] [{color}]{final_prediction}[/{color}]")
 
 
 def plot_pruned_tree(pruned_model: DecisionTreeClassifier, feature_names: list[str]) -> None:
-    _fig, ax = plt.subplots(figsize=(20, 8))
+    _, ax = plt.subplots(figsize=(20, 8))
     plot_tree(
         pruned_model,
         feature_names=feature_names,
@@ -162,16 +160,6 @@ def main() -> None:
     pruned_model = build_pruned_model(artifacts)
     feature_names: list[str] = list(artifacts.x_train.columns)
     employee_frame = build_employee_frame(artifacts)
-
-    prediction: np.ndarray = pruned_model.predict(employee_frame)
-    label: str = "Left" if prediction[0] == 1 else "Stayed"
-
-    console.print(
-        Panel(
-            f"[bold]Pruned depth:[/bold] {PRUNED_DEPTH}  [bold]Leaf nodes:[/bold] {pruned_model.get_n_leaves()}  [bold]Prediction:[/bold] {label}",
-            title="Workforce Attrition — Q09 Decision Path Interpretation",
-        ),
-    )
 
     steps = trace_decision_path(pruned_model, employee_frame, feature_names)
     report_decision_path(steps)

@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
@@ -181,17 +180,14 @@ def compare_regression(
 
 def report_engineered_features() -> None:
     console.print(
-        Panel(
-            "[bold]salary_per_tenure[/bold] = Monthly_Salary_PHP / (Tenure_Years + 1)\n"
-            "  Measures compensation relative to loyalty. A low ratio flags long-tenured employees who may be underpaid compared to newer hires.\n\n"
-            "[bold]overtime_to_satisfaction_ratio[/bold] = Overtime_Hours_Monthly / (Job_Satisfaction_Score + 1)\n"
-            "  Captures workload-to-satisfaction imbalance. High values indicate employees working excessive overtime despite low satisfaction — a strong flight risk signal.\n\n"
-            "[bold]promotion_rate[/bold] = Num_Promotions / (Tenure_Years + 1)\n"
-            "  Measures career velocity. Employees with low promotion rates relative to tenure may feel stagnated, correlating with disengagement and attrition.\n\n"
-            "[bold]absence_to_tenure_ratio[/bold] = Absences_YTD / (Tenure_Years + 1)\n"
-            "  Normalizes absenteeism by tenure. High ratios in newer employees may indicate early disengagement; high ratios in senior employees may signal burnout.",
-            title="Bonus 3 — Engineered Features: HR Interpretation",
-        ),
+        "[bold]salary_per_tenure[/bold] = Monthly_Salary_PHP / (Tenure_Years + 1)\n"
+        "  Measures compensation relative to loyalty. A low ratio flags long-tenured employees who may be underpaid compared to newer hires.\n\n"
+        "[bold]overtime_to_satisfaction_ratio[/bold] = Overtime_Hours_Monthly / (Job_Satisfaction_Score + 1)\n"
+        "  Captures workload-to-satisfaction imbalance. High values indicate employees working excessive overtime despite low satisfaction — a strong flight risk signal.\n\n"
+        "[bold]promotion_rate[/bold] = Num_Promotions / (Tenure_Years + 1)\n"
+        "  Measures career velocity. Employees with low promotion rates relative to tenure may feel stagnated, correlating with disengagement and attrition.\n\n"
+        "[bold]absence_to_tenure_ratio[/bold] = Absences_YTD / (Tenure_Years + 1)\n"
+        "  Normalizes absenteeism by tenure. High ratios in newer employees may indicate early disengagement; high ratios in senior employees may signal burnout.\n",
     )
 
 
@@ -255,14 +251,13 @@ def report_regression_comparison(comparisons: list[RegressionComparison]) -> Non
         )
 
     console.print(table)
-    console.print("[dim]NZ = number of non-zero coefficients. Δ RMSE: negative is improvement (lower error).[/dim]")
 
 
 def plot_correlation(df: pd.DataFrame) -> None:
     correlation_columns: list[str] = [*ENGINEERED_FEATURES, "Attrition", "Monthly_Salary_PHP"]
     correlation_matrix = df[correlation_columns].corr()
 
-    _fig, ax = plt.subplots(figsize=(10, 7))
+    _, ax = plt.subplots(figsize=(10, 7))
     sns.heatmap(
         correlation_matrix,
         annot=True,
@@ -286,7 +281,7 @@ def plot_tree_comparison(comparison: TreeComparison) -> None:
     x = np.arange(len(categories))
     width: float = 0.35
 
-    _fig, ax = plt.subplots(figsize=(8, 5))
+    _, ax = plt.subplots(figsize=(8, 5))
     ax.bar(x - width / 2, baseline_values, width, label="Baseline", color="steelblue")
     ax.bar(x + width / 2, engineered_values, width, label="With Engineered Features", color="tomato")
 
@@ -308,7 +303,7 @@ def plot_regression_comparison(comparisons: list[RegressionComparison]) -> None:
     x = np.arange(len(model_names))
     width: float = 0.35
 
-    _fig, ax = plt.subplots(figsize=(9, 5))
+    _, ax = plt.subplots(figsize=(9, 5))
     ax.bar(x - width / 2, baseline_r2, width, label="Baseline", color="steelblue")
     ax.bar(x + width / 2, engineered_r2, width, label="With Engineered Features", color="tomato")
 
@@ -329,12 +324,9 @@ def main() -> None:
     lasso_artifacts = get_lasso_artifacts()
 
     console.print(
-        Panel(
-            f"[bold]Baseline dataset:[/bold] {df_baseline.shape[0]} rows, {df_baseline.shape[1]} columns\n"
-            f"[bold]Engineered dataset:[/bold] {df_engineered.shape[0]} rows, {df_engineered.shape[1]} columns\n"
-            f"[bold]New features:[/bold] {', '.join(ENGINEERED_FEATURES)}",
-            title="Workforce Attrition — Bonus 3: Feature Engineering and Model Improvement",
-        ),
+        f"[bold]Baseline dataset:[/bold] {df_baseline.shape[0]} rows, {df_baseline.shape[1]} columns\n"
+        f"[bold]Engineered dataset:[/bold] {df_engineered.shape[0]} rows, {df_engineered.shape[1]} columns\n"
+        f"[bold]New features:[/bold] {', '.join(ENGINEERED_FEATURES)}\n",
     )
 
     report_engineered_features()
@@ -343,6 +335,7 @@ def main() -> None:
     regression_comparisons = compare_regression(df_baseline, df_engineered, ridge_artifacts, lasso_artifacts)
 
     report_tree_comparison(tree_comparison)
+    console.print()
     report_regression_comparison(regression_comparisons)
 
     plot_correlation(df_engineered)

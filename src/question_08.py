@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
@@ -64,12 +63,11 @@ def report_pruned(artifacts: ModelArtifacts, curve: pd.DataFrame) -> None:
 
     gap_unpruned: float = unpruned_row["train_accuracy"] - unpruned_row["test_accuracy"]
     gap_pruned: float = pruned_row["train_accuracy"] - pruned_row["test_accuracy"]
-    console.print(f"\n[bold]Train-Test gap:[/bold] unpruned=[bright_red]{gap_unpruned:.4f}[/bright_red]  pruned=[bright_green]{gap_pruned:.4f}[/bright_green]")
-    console.print("[dim]A smaller gap indicates reduced overfitting.[/dim]")
+    console.print(f"[bold]Train-Test gap:[/bold] unpruned=[bright_red]{gap_unpruned:.4f}[/bright_red]  pruned=[bright_green]{gap_pruned:.4f}[/bright_green]")
 
 
 def plot_depth_curve(curve: pd.DataFrame) -> None:
-    _fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
 
     ax.plot(curve["depth"], curve["train_accuracy"], color="steelblue", marker="o", label="Training Accuracy")
     ax.plot(curve["depth"], curve["test_accuracy"], color="tomato", marker="o", label="Testing Accuracy")
@@ -86,13 +84,6 @@ def plot_depth_curve(curve: pd.DataFrame) -> None:
 
 def main() -> None:
     artifacts = get_model_artifacts()
-
-    console.print(
-        Panel(
-            f"[bold]Unpruned depth:[/bold] {artifacts.model.get_depth()}  [bold]Pruned depth:[/bold] {PRUNED_DEPTH}",
-            title="Workforce Attrition - Q08 Pruning & Bias-Variance Tradeoff",
-        ),
-    )
 
     curve = compute_depth_curve(artifacts)
     report_pruned(artifacts, curve)

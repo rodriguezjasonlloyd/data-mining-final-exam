@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console, get_clean_df
@@ -79,47 +78,31 @@ def report_salary_summary(high_risk: pd.DataFrame) -> None:
 
     gap_color = "bright_red" if avg_gap < 0 else "bright_green"
 
-    summary = (
-        f"[bold]Employees analyzed:[/bold] {len(high_risk)}\n"
+    console.print(
         f"[bold]Underpaid (actual < predicted):[/bold] [bright_red]{underpaid_count}[/bright_red] of {len(high_risk)}\n"
         f"[bold]Average actual salary:[/bold] PHP {avg_actual:,.0f}\n"
         f"[bold]Average predicted salary:[/bold] PHP {avg_predicted:,.0f}\n"
-        f"[bold]Average salary gap:[/bold] [{gap_color}]PHP {avg_gap:+,.0f}[/{gap_color}]\n\n"
-        f"[bold]Interpretation:[/bold]\n"
-        f"A negative salary gap means the employee earns less than what their profile predicts — "
-        f"a strong signal of underpayment. For employees who are both flagged by the Decision Tree "
-        f"as likely to leave and placed in the Flight Risk cluster by unsupervised clustering, "
-        f"underpayment compounds the departure risk. HR should prioritize salary reviews for "
-        f"individuals with the largest negative gaps and highest attrition probabilities."
+        f"[bold]Average salary gap:[/bold] [{gap_color}]PHP {avg_gap:+,.0f}[/{gap_color}]",
     )
-
-    console.print(Panel(summary, title="Q21 — Salary Gap Analysis"))
 
 
 def main() -> None:
     df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Dataset:[/bold] {len(df)} employees\n[bold]Criteria:[/bold] Decision Tree predicted leave AND assigned to Flight Risk cluster",
-            title="Workforce Attrition — Q21 High-Risk Employee Analysis",
-        ),
-    )
 
     model_artifacts = get_model_artifacts()
     cluster_artifacts = get_complete_cluster_artifacts()
     lasso_artifacts = get_lasso_artifacts()
 
     flight_risk_ids = get_flight_risk_ids(cluster_artifacts)
-    console.print(f"[dim]Flight Risk cluster size: {len(flight_risk_ids)} employees (from 300-employee sample)[/dim]")
+    console.print(f"Flight Risk cluster size: {len(flight_risk_ids)} employees (from 300 employee sample)")
 
     master = build_master_frame(df, model_artifacts, lasso_artifacts)
 
     dt_predicted_leave: int = int(master["predicted_attrition"].sum())
-    console.print(f"[dim]DT predicted leave (full dataset): {dt_predicted_leave} of {len(master)} employees[/dim]")
+    console.print(f"DT predicted leave (full dataset): {dt_predicted_leave} of {len(master)} employees")
 
     high_risk = identify_high_risk(master, flight_risk_ids)
-    console.print(f"[dim]Intersection (both criteria): {len(high_risk)} employees — showing top {TOP_N}[/dim]\n")
+    console.print(f"Intersection (both criteria): {len(high_risk)} employees — showing top {TOP_N}\n")
 
     report_high_risk(high_risk)
     report_salary_summary(high_risk)

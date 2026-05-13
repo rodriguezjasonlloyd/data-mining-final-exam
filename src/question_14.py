@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from matplotlib.container import BarContainer
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console
@@ -51,42 +50,12 @@ def report_attrition_by_cluster(frame: pd.DataFrame) -> None:
     highest_cluster: str = str(crosstab.index[0])
     highest_rate: float = float(crosstab.iloc[0]["Attrition_Rate_%"])
     console.print(f"\n[bold]Highest attrition cluster:[/bold] [bright_red]{highest_cluster}[/bright_red] ({highest_rate:.2f}%)")
-    console.print(
-        "[dim]Clustering reveals hidden employee segments that attrition labels alone cannot surface. "
-        "The Flight Risk cluster concentrates low performers with low satisfaction — a pattern "
-        "invisible in aggregate attrition statistics.[/dim]",
-    )
-
-
-def report_clustering_value() -> None:
-    table = Table(title="How Clustering Supports Classification", show_lines=True)
-    table.add_column("Aspect", style="bright_cyan")
-    table.add_column("Insight")
-
-    table.add_row(
-        "Hidden groups",
-        "Clustering surfaces behavioral segments without using Attrition as input",
-    )
-    table.add_row(
-        "Feature enrichment",
-        "Cluster membership can be added as a feature to the Decision Tree to improve predictions",
-    )
-    table.add_row(
-        "Targeted intervention",
-        "Unlike binary attrition labels, clusters explain WHY employees are at risk",
-    )
-    table.add_row(
-        "Validation",
-        "High attrition concentration in Flight Risk cluster confirms cluster validity",
-    )
-
-    console.print(table)
 
 
 def plot_attrition_heatmap(frame: pd.DataFrame) -> None:
     crosstab = pd.crosstab(frame["Cluster_Name"], frame["Attrition_Label"])
 
-    _fig, ax = plt.subplots(figsize=(7, 4))
+    _, ax = plt.subplots(figsize=(7, 4))
     sns.heatmap(
         crosstab,
         annot=True,
@@ -102,9 +71,16 @@ def plot_attrition_heatmap(frame: pd.DataFrame) -> None:
 
 
 def plot_attrition_rate_by_cluster(frame: pd.DataFrame) -> None:
-    rate_df = frame.groupby("Cluster_Name")["Attrition"].mean().mul(100).reset_index().rename(columns={"Attrition": "Attrition_Rate_%"}).sort_values("Attrition_Rate_%", ascending=False)
+    rate_df = (
+        frame.groupby("Cluster_Name")["Attrition"]
+        .mean()
+        .mul(100)
+        .reset_index()
+        .rename(columns={"Attrition": "Attrition_Rate_%"})
+        .sort_values("Attrition_Rate_%", ascending=False)
+    )
 
-    _fig, ax = plt.subplots(figsize=(8, 5))
+    _, ax = plt.subplots(figsize=(8, 5))
     sns.barplot(
         data=rate_df,
         x="Cluster_Name",
@@ -130,15 +106,9 @@ def main() -> None:
     artifacts = get_complete_cluster_artifacts()
     frame = build_analysis_frame(artifacts)
 
-    console.print(
-        Panel(
-            f"[bold]Sample size:[/bold] {len(frame)}  [bold]Clusters:[/bold] {frame['Cluster'].nunique()}  [bold]Attrition rate:[/bold] {frame['Attrition'].mean() * 100:.1f}%",
-            title="Workforce Attrition — Q14 Cluster and Attrition Analysis",
-        ),
-    )
+    console.print(f"[bold]Attrition rate:[/bold] {frame['Attrition'].mean() * 100:.1f}%\n")
 
     report_attrition_by_cluster(frame)
-    report_clustering_value()
     plot_attrition_heatmap(frame)
     plot_attrition_rate_by_cluster(frame)
 

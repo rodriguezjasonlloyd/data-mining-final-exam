@@ -2,7 +2,6 @@
 
 import pandas as pd
 import statsmodels.api as sm
-from rich.panel import Panel
 from rich.table import Table
 from statsmodels.regression.linear_model import RegressionResultsWrapper
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -161,13 +160,6 @@ def report_ols_comparison(original_model: RegressionResultsWrapper, remediated_m
 
 def main() -> None:
     artifacts = get_ols_artifacts()
-
-    console.print(
-        Panel(
-            f"[bold]Features:[/bold] {len(artifacts.feature_names)}  [bold]Train samples:[/bold] {artifacts.x_train.shape[0]}",
-            title="Workforce Attrition — Q16 Multicollinearity and VIF",
-        ),
-    )
 
     vif_before = compute_vif(artifacts.x_train)
     report_vif(vif_before, "VIF — Before Remediation (Original Features)")

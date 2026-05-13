@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
@@ -104,8 +103,7 @@ def report_metrics(metrics: dict[str, float]) -> None:
 
     gap: float = metrics["train_r2"] - metrics["test_r2"]
     color = "bright_red" if gap > 0.05 else "bright_green"
-    console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
-    console.print("[dim]A gap > 0.05 suggests overfitting.[/dim]")
+    console.print(f"[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]\n")
 
 
 def report_statsmodels_summary(x_train: pd.DataFrame, y_train: pd.Series) -> None:
@@ -140,14 +138,7 @@ def report_statsmodels_summary(x_train: pd.DataFrame, y_train: pd.Series) -> Non
 
 
 def main() -> None:
-    df = get_clean_df()
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns\n[bold]Target:[/bold] {TARGET_COLUMN}",
-            title="Workforce Attrition — Q15 OLS Regression",
-        ),
-    )
+    console.print(f"[bold]Target:[/bold] {TARGET_COLUMN}\n")
 
     ols_artifacts = get_ols_artifacts()
     metrics = compute_metrics(ols_artifacts)
@@ -155,12 +146,7 @@ def main() -> None:
     report_metrics(metrics)
     report_statsmodels_summary(ols_artifacts.x_train, ols_artifacts.y_train)
 
-    console.print(
-        Panel(
-            f"[bold]Train samples:[/bold] {ols_artifacts.x_train.shape[0]}  [bold]Test samples:[/bold] {ols_artifacts.x_test.shape[0]}  [bold]Features:[/bold] {len(ols_artifacts.feature_names)}",
-            title="Train/Test Split (70/30)",
-        ),
-    )
+    console.print(f"[bold]Train samples:[/bold] {ols_artifacts.x_train.shape[0]}\n[bold]Test samples:[/bold] {ols_artifacts.x_test.shape[0]}")
 
 
 if __name__ == "__main__":

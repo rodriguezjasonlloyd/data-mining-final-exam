@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
@@ -44,8 +43,7 @@ def report_metrics(artifacts: ModelArtifacts) -> np.ndarray:
         )
 
     console.print(table)
-    console.print(f"\n[bold]Accuracy:[/bold] {accuracy:.4f}")
-    console.print("\n[bold]Most important metric:[/bold] [bright_yellow]Recall (Left)[/bright_yellow] — missing an employee who will leave is more costly than a false alarm.")
+    console.print(f"[bold]Accuracy:[/bold] {accuracy:.4f}")
 
     return y_prediction
 
@@ -53,7 +51,7 @@ def report_metrics(artifacts: ModelArtifacts) -> np.ndarray:
 def plot_confusion_matrix(artifacts: ModelArtifacts, y_prediction: np.ndarray) -> None:
     cm = confusion_matrix(artifacts.y_test, y_prediction)
 
-    _fig, ax = plt.subplots(figsize=(6, 5))
+    _, ax = plt.subplots(figsize=(6, 5))
     sns.heatmap(
         cm,
         annot=True,
@@ -72,13 +70,6 @@ def plot_confusion_matrix(artifacts: ModelArtifacts, y_prediction: np.ndarray) -
 
 def main() -> None:
     artifacts = get_model_artifacts()
-
-    console.print(
-        Panel(
-            f"[bold]Test samples:[/bold] {len(artifacts.y_test)}",
-            title="Workforce Attrition — Q06 Model Evaluation",
-        ),
-    )
 
     y_prediction = report_metrics(artifacts)
     plot_confusion_matrix(artifacts, y_prediction)

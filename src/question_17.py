@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from pydantic import BaseModel
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, r2_score
@@ -85,7 +84,7 @@ def report_metrics(ridge_artifacts: RidgeArtifacts) -> None:
 
     gap: float = ridge_artifacts.train_r2 - ridge_artifacts.test_r2
     color = "bright_red" if gap > 0.05 else "bright_green"
-    console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
+    console.print(f"[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]\n")
 
 
 def report_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: RidgeArtifacts) -> None:
@@ -114,8 +113,7 @@ def report_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: 
 
     console.print(table)
     most_shrunk: str = str(comparison.index[0])
-    console.print(f"\n[bold]Most shrunk feature:[/bold] [bright_yellow]{most_shrunk}[/bright_yellow] (shrinkage={comparison.iloc[0]['Shrinkage']:,.2f})")
-    console.print("[dim]Ridge shrinks all coefficients toward zero but retains all features — no coefficient reaches exactly zero.[/dim]")
+    console.print(f"[bold]Most shrunk feature:[/bold] [bright_yellow]{most_shrunk}[/bright_yellow] (shrinkage={comparison.iloc[0]['Shrinkage']:,.2f})")
 
 
 def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: RidgeArtifacts) -> None:
@@ -126,7 +124,7 @@ def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: Ri
     plot_df = plot_df.rename(columns={"index": "Feature"})
     plot_df = pd.melt(plot_df, id_vars="Feature", var_name="Model", value_name="Coefficient")
 
-    _fig, ax = plt.subplots(figsize=(12, 7))
+    _, ax = plt.subplots(figsize=(12, 7))
     sns.barplot(data=plot_df, x="Coefficient", y="Feature", hue="Model", ax=ax, palette={"OLS": "steelblue", "Ridge": "tomato"})
     ax.axvline(x=0, color="black", linewidth=0.8, linestyle="--")
     ax.set_title(f"OLS vs Ridge Coefficients (λ={ridge_artifacts.optimal_alpha})")
@@ -139,12 +137,7 @@ def plot_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: Ri
 def main() -> None:
     ols_artifacts = get_ols_artifacts()
 
-    console.print(
-        Panel(
-            f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}",
-            title="Workforce Attrition — Q17 Ridge Regression",
-        ),
-    )
+    console.print(f"[bold]Alpha grid:[/bold] {ALPHA_GRID}\n[bold]Cross-validation folds:[/bold] {CV_FOLDS}\n")
 
     ridge_artifacts = get_ridge_artifacts()
     report_metrics(ridge_artifacts)

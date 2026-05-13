@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from rich.panel import Panel
 from rich.table import Table
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
@@ -67,26 +66,23 @@ def report_tradeoff_analysis(curve: pd.DataFrame, optimal_depth: int) -> None:
     overfitting_start = int(overfitting_depths["depth"].min()) if not overfitting_depths.empty else optimal_depth + 1
 
     console.print(
-        Panel(
-            f"[bold]Optimal depth:[/bold] [bright_green]{optimal_depth}[/bright_green]  "
-            f"[bold]Testing accuracy at optimal:[/bold] {optimal_row['testing_accuracy']:.4f}  "
-            f"[bold]Training accuracy at optimal:[/bold] {optimal_row['training_accuracy']:.4f}\n\n"
-            f"[bold]Underfitting zone:[/bold] {underfitting_range} — low depth limits the tree's ability to capture "
-            f"meaningful decision boundaries, resulting in both low training and testing accuracy (high bias).\n\n"
-            f"[bold]Overfitting zone:[/bold] depth ≥ {overfitting_start} — the tree memorizes training noise. "
-            f"At full depth ({max_depth}), training accuracy={full_row['training_accuracy']:.4f} but "
-            f"testing accuracy={full_row['testing_accuracy']:.4f} "
-            f"(gap={full_row['training_accuracy'] - full_row['testing_accuracy']:.4f}), indicating high variance.\n\n"
-            f"[bold]Bias-variance tradeoff:[/bold] Shallow trees have high bias (underfit); deep trees have high variance "
-            f"(overfit). Depth {optimal_depth} balances both — it achieves the highest generalizable testing accuracy "
-            f"({optimal_row['testing_accuracy']:.4f}) before variance begins to dominate.",
-            title="Bonus 1 — Bias-Variance Tradeoff Analysis",
-        ),
+        f"[bold]Optimal depth:[/bold] [bright_green]{optimal_depth}[/bright_green]  "
+        f"[bold]Testing accuracy at optimal:[/bold] {optimal_row['testing_accuracy']:.4f}  "
+        f"[bold]Training accuracy at optimal:[/bold] {optimal_row['training_accuracy']:.4f}\n\n"
+        f"[bold]Underfitting zone:[/bold] {underfitting_range} — low depth limits the tree's ability to capture "
+        f"meaningful decision boundaries, resulting in both low training and testing accuracy (high bias).\n"
+        f"[bold]Overfitting zone:[/bold] depth ≥ {overfitting_start} — the tree memorizes training noise. "
+        f"At full depth ({max_depth}), training accuracy={full_row['training_accuracy']:.4f} but "
+        f"testing accuracy={full_row['testing_accuracy']:.4f} "
+        f"(gap={full_row['training_accuracy'] - full_row['testing_accuracy']:.4f}), indicating high variance.\n"
+        f"[bold]Bias-variance tradeoff:[/bold] Shallow trees have high bias (underfit); deep trees have high variance "
+        f"(overfit). Depth {optimal_depth} balances both — it achieves the highest generalizable testing accuracy "
+        f"({optimal_row['testing_accuracy']:.4f}) before variance begins to dominate.",
     )
 
 
 def plot_depth_curve(curve: pd.DataFrame, optimal_depth: int) -> None:
-    _fig, ax = plt.subplots(figsize=(12, 6))
+    _, ax = plt.subplots(figsize=(12, 6))
 
     ax.plot(curve["depth"], curve["training_accuracy"], color="steelblue", marker="o", linewidth=2, label="Training Accuracy")
     ax.plot(curve["depth"], curve["testing_accuracy"], color="tomato", marker="o", linewidth=2, label="Testing Accuracy")
@@ -114,10 +110,7 @@ def main() -> None:
     artifacts = get_model_artifacts()
 
     console.print(
-        Panel(
-            f"[bold]Unpruned tree depth:[/bold] {artifacts.model.get_depth()}  [bold]Training samples:[/bold] {len(artifacts.x_train)}  [bold]Testing samples:[/bold] {len(artifacts.x_test)}",
-            title="Workforce Attrition — Bonus 1: Decision Tree Optimization",
-        ),
+        f"[bold]Unpruned tree depth:[/bold] {artifacts.model.get_depth()}  [bold]Training samples:[/bold] {len(artifacts.x_train)}  [bold]Testing samples:[/bold] {len(artifacts.x_test)}\n",
     )
 
     curve = compute_depth_curve(artifacts)

@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console, get_clean_df
@@ -45,9 +44,6 @@ def report_salary_correlations(correlation: pd.DataFrame) -> None:
 
     console.print(table)
 
-    strongest = salary_correlation.index[0]
-    console.print(f"\n[bold]Strongest predictor:[/bold] {strongest} (r={salary_correlation[strongest]:.4f})")
-
 
 def report_multicollinearity(correlation: pd.DataFrame) -> None:
     table = Table(title="Predictor Intercorrelations (multicollinearity check)", show_lines=True)
@@ -69,7 +65,7 @@ def report_multicollinearity(correlation: pd.DataFrame) -> None:
 
 
 def plot_heatmap(corr: pd.DataFrame) -> None:
-    _fig, ax = plt.subplots(figsize=(8, 6))
+    _, ax = plt.subplots(figsize=(8, 6))
     sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", center=0, square=True, ax=ax)
     ax.set_title("Correlation Heatmap — Salary Predictors")
     plt.tight_layout()
@@ -78,13 +74,6 @@ def plot_heatmap(corr: pd.DataFrame) -> None:
 
 def main() -> None:
     df = encode_education(get_clean_df())
-
-    console.print(
-        Panel(
-            f"[bold]Cleaned dataset:[/bold] {df.shape[0]} rows x {df.shape[1]} columns",
-            title="Workforce Attrition — Q03 Correlation Analysis",
-        ),
-    )
 
     correlations = compute_correlations(df)
 

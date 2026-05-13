@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from rich.panel import Panel
 from rich.table import Table
 
 from question_01 import console
@@ -44,7 +43,7 @@ def report_importance(importance_df: pd.DataFrame) -> None:
 def plot_importance(importance_df: pd.DataFrame) -> None:
     plot_df = importance_df.sort_values("importance_pct", ascending=True)
 
-    _fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
     bars = sns.barplot(data=plot_df, y="feature", x="importance_pct", ax=ax, color="steelblue")
 
     for bar, (_, row) in zip(bars.patches, plot_df.iterrows(), strict=False):
@@ -66,16 +65,11 @@ def plot_importance(importance_df: pd.DataFrame) -> None:
 def main() -> None:
     artifacts = get_model_artifacts()
 
-    console.print(
-        Panel(
-            f"[bold]Model depth:[/bold] {artifacts.model.get_depth()}  [bold]Features:[/bold] {artifacts.x_train.shape[1]}",
-            title="Workforce Attrition — Q07 Feature Importance",
-        ),
-    )
-
     importance_df = compute_importance(artifacts)
     report_importance(importance_df)
     plot_importance(importance_df)
+
+    console.print(f"[bold]Model depth:[/bold] {artifacts.model.get_depth()} [bold]Features:[/bold] {artifacts.x_train.shape[1]}")
 
 
 if __name__ == "__main__":
