@@ -29,7 +29,7 @@ def report_attrition_by_cluster(frame: pd.DataFrame) -> None:
     crosstab = crosstab.sort_values("Attrition_Rate_%", ascending=False)
 
     table = Table(title="Attrition Distribution by Cluster", show_lines=True)
-    table.add_column("Cluster", style="cyan")
+    table.add_column("Cluster", style="bright_cyan")
     table.add_column("Stayed", justify="right")
     table.add_column("Left", justify="right")
     table.add_column("Total", justify="right")
@@ -37,7 +37,7 @@ def report_attrition_by_cluster(frame: pd.DataFrame) -> None:
 
     for cluster_name, row in crosstab.iterrows():
         rate: float = row["Attrition_Rate_%"]
-        color = "red" if rate > 60 else "yellow" if rate > 40 else "green"
+        color = "bright_red" if rate > 60 else "bright_yellow" if rate > 40 else "bright_green"
         table.add_row(
             str(cluster_name),
             str(int(row.get("Stayed", 0))),
@@ -50,7 +50,7 @@ def report_attrition_by_cluster(frame: pd.DataFrame) -> None:
 
     highest_cluster: str = str(crosstab.index[0])
     highest_rate: float = float(crosstab.iloc[0]["Attrition_Rate_%"])
-    console.print(f"\n[bold]Highest attrition cluster:[/bold] [red]{highest_cluster}[/red] ({highest_rate:.2f}%)")
+    console.print(f"\n[bold]Highest attrition cluster:[/bold] [bright_red]{highest_cluster}[/bright_red] ({highest_rate:.2f}%)")
     console.print(
         "[dim]Clustering reveals hidden employee segments that attrition labels alone cannot surface. "
         "The Flight Risk cluster concentrates low performers with low satisfaction — a pattern "
@@ -60,7 +60,7 @@ def report_attrition_by_cluster(frame: pd.DataFrame) -> None:
 
 def report_clustering_value() -> None:
     table = Table(title="How Clustering Supports Classification", show_lines=True)
-    table.add_column("Aspect", style="cyan")
+    table.add_column("Aspect", style="bright_cyan")
     table.add_column("Insight")
 
     table.add_row(

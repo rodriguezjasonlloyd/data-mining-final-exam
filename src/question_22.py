@@ -21,7 +21,7 @@ def report_contradictions(contradictions: pd.DataFrame) -> None:
         title="Contradiction Cases — DT Predicts Stay, Cluster = Flight Risk",
         show_lines=True,
     )
-    table.add_column("Employee_ID", style="cyan")
+    table.add_column("Employee_ID", style="bright_cyan")
     table.add_column("Actual Salary (PHP)", justify="right")
     table.add_column("Predicted Salary (PHP)", justify="right")
     table.add_column("Salary Gap (PHP)", justify="right")
@@ -30,8 +30,8 @@ def report_contradictions(contradictions: pd.DataFrame) -> None:
 
     for _, row in contradictions.iterrows():
         gap: float = row["salary_gap"]
-        gap_color = "red" if gap < -5000 else "yellow" if gap < 0 else "green"
-        actual_color = "red" if row["Attrition"] == 1 else "green"
+        gap_color = "bright_red" if gap < -5000 else "bright_yellow" if gap < 0 else "bright_green"
+        actual_color = "bright_red" if row["Attrition"] == 1 else "bright_green"
         table.add_row(
             str(row["Employee_ID"]),
             f"{row['Monthly_Salary_PHP']:,.0f}",
@@ -52,9 +52,9 @@ def report_contradiction_summary(contradictions: pd.DataFrame) -> None:
 
     summary = (
         f"[bold]Contradiction cases found:[/bold] {total}\n"
-        f"[bold]Of these, actually left:[/bold] [red]{actually_left}[/red] ({actually_left / total * 100:.1f}%) — "
+        f"[bold]Of these, actually left:[/bold] [bright_red]{actually_left}[/bright_red] ({actually_left / total * 100:.1f}%) — "
         f"confirming the cluster captured real risk the DT missed\n"
-        f"[bold]Underpaid (actual < predicted salary):[/bold] [yellow]{underpaid}[/yellow] of {total}\n"
+        f"[bold]Underpaid (actual < predicted salary):[/bold] [bright_yellow]{underpaid}[/bright_yellow] of {total}\n"
         f"[bold]Average DT attrition probability:[/bold] {avg_probability:.3f} "
         f"[dim](below 0.5 — hence predicted stay)[/dim]\n\n"
         f"[bold]Why do the models disagree?[/bold]\n\n"
@@ -66,10 +66,10 @@ def report_contradiction_summary(contradictions: pd.DataFrame) -> None:
         f"An employee lands in the Flight Risk cluster because their overall profile resembles others who left, "
         f"even if no single feature is extreme enough to trigger the DT's decision rules.\n\n"
         f"[bold]What each model captures differently:[/bold]\n"
-        f"• The DT captures [cyan]explicit, threshold-based attrition signals[/cyan] identified during supervised training.\n"
-        f"• Clustering captures [yellow]latent structural similarity[/yellow] — employees who share a broader pattern "
+        f"• The DT captures [bright_cyan]explicit, threshold-based attrition signals[/bright_cyan] identified during supervised training.\n"
+        f"• Clustering captures [bright_yellow]latent structural similarity[/bright_yellow] — employees who share a broader pattern "
         f"of disengagement across multiple dimensions simultaneously.\n\n"
-        f"[bold]HR implication:[/bold] These contradiction employees are [red]silent flight risks[/red]. "
+        f"[bold]HR implication:[/bold] These contradiction employees are [bright_red]silent flight risks[/bright_red]. "
         f"The DT's rules give them a pass, but their overall profile places them among employees historically "
         f"prone to leaving. They warrant proactive monitoring — satisfaction check-ins, salary benchmarking, "
         f"and workload review — before their risk becomes visible in performance or attendance data."

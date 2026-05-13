@@ -69,7 +69,7 @@ def report_comparison(average_artifacts: ClusterArtifacts, complete_artifacts: C
         balance_ratio: float = round(min_size / max_size, 3)
 
         table = Table(title=f"Cluster Profiles — {method.title()} Linkage ({DISTANCE_METRIC.title()})", show_lines=True)
-        table.add_column("Cluster", style="cyan")
+        table.add_column("Cluster", style="bright_cyan")
         table.add_column("Size", justify="right")
         table.add_column("Attrition %", justify="right")
         table.add_column("Avg Salary", justify="right")
@@ -80,7 +80,7 @@ def report_comparison(average_artifacts: ClusterArtifacts, complete_artifacts: C
         for cluster_id in sorted(profile_df["Cluster"].unique()):
             group = profile_df[profile_df["Cluster"] == cluster_id]
             attrition_pct: float = group["Attrition"].mean() * 100
-            color = "red" if attrition_pct > 40 else "yellow" if attrition_pct > 20 else "green"
+            color = "bright_red" if attrition_pct > 40 else "bright_yellow" if attrition_pct > 20 else "bright_green"
 
             table.add_row(
                 str(cluster_id),
@@ -96,7 +96,7 @@ def report_comparison(average_artifacts: ClusterArtifacts, complete_artifacts: C
         console.print(f"  [dim]Balance ratio (min/max cluster size): {balance_ratio:.3f} — closer to 1.0 is more balanced[/dim]\n")
 
     summary_table = Table(title="Linkage Method Comparison Summary", show_lines=True)
-    summary_table.add_column("Method", style="cyan")
+    summary_table.add_column("Method", style="bright_cyan")
     summary_table.add_column("Cluster Sizes", justify="right")
     summary_table.add_column("Balance Ratio", justify="right")
     summary_table.add_column("Chaining?", justify="right")
@@ -118,15 +118,15 @@ def report_comparison(average_artifacts: ClusterArtifacts, complete_artifacts: C
         "Average",
         str(average_counts.tolist()),
         f"{average_balance:.3f}",
-        "[red]Yes[/red]" if average_chaining else "[green]No[/green]",
-        "[red]Not suitable — chaining detected[/red]" if average_chaining else "[green]Suitable[/green]",
+        "[bright_red]Yes[/bright_red]" if average_chaining else "[bright_green]No[/bright_green]",
+        "[bright_red]Not suitable — chaining detected[/bright_red]" if average_chaining else "[bright_green]Suitable[/bright_green]",
     )
     summary_table.add_row(
         "Complete",
         str(complete_counts.tolist()),
         f"{complete_balance:.3f}",
-        "[red]Yes[/red]" if complete_chaining else "[green]No[/green]",
-        "[green]More balanced separation[/green]" if not complete_chaining else "[red]Not suitable — chaining detected[/red]",
+        "[bright_red]Yes[/bright_red]" if complete_chaining else "[bright_green]No[/bright_green]",
+        "[bright_green]More balanced separation[/bright_green]" if not complete_chaining else "[bright_red]Not suitable — chaining detected[/bright_red]",
     )
 
     console.print(summary_table)

@@ -33,14 +33,14 @@ def report_salary_correlations(correlation: pd.DataFrame) -> None:
     salary_correlation = correlation["Monthly_Salary_PHP"].drop("Monthly_Salary_PHP").sort_values(key=abs, ascending=False)
 
     table = Table(title="Pearson Correlation with Monthly_Salary_PHP", show_lines=True)
-    table.add_column("Predictor", style="cyan")
+    table.add_column("Predictor", style="bright_cyan")
     table.add_column("Correlation", justify="right")
     table.add_column("Strength", justify="right")
 
     for predictor, value in salary_correlation.items():
         absolute_value = abs(value)
         strength = "strong" if absolute_value > 0.5 else "moderate" if absolute_value > 0.3 else "weak"
-        color = "green" if absolute_value > 0.5 else "yellow" if absolute_value > 0.3 else "dim"
+        color = "bright_green" if absolute_value > 0.5 else "bright_yellow" if absolute_value > 0.3 else "dim"
         table.add_row(str(predictor), f"{value:.4f}", f"[{color}]{strength}[/{color}]")
 
     console.print(table)
@@ -53,7 +53,7 @@ def report_multicollinearity(correlation: pd.DataFrame) -> None:
     table = Table(title="Predictor Intercorrelations (multicollinearity check)", show_lines=True)
     predictors = [col for col in SALARY_PREDICTORS if col != "Monthly_Salary_PHP"]
 
-    table.add_column("Pair", style="cyan")
+    table.add_column("Pair", style="bright_cyan")
     table.add_column("Correlation", justify="right")
     table.add_column("Risk", justify="right")
 
@@ -62,7 +62,7 @@ def report_multicollinearity(correlation: pd.DataFrame) -> None:
             value = correlation.loc[column_a, column_b]
             absolute_value = abs(value)
             risk = "high" if absolute_value > 0.7 else "moderate" if absolute_value > 0.5 else "low"
-            color = "red" if absolute_value > 0.7 else "yellow" if absolute_value > 0.5 else "green"
+            color = "bright_red" if absolute_value > 0.7 else "bright_yellow" if absolute_value > 0.5 else "bright_green"
             table.add_row(f"{column_a} x {column_b}", f"{value:.4f}", f"[{color}]{risk}[/{color}]")
 
     console.print(table)

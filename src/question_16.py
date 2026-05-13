@@ -22,18 +22,18 @@ def compute_vif(x_train: pd.DataFrame) -> pd.DataFrame:
 
 def report_vif(vif_df: pd.DataFrame) -> None:
     table = Table(title="Variance Inflation Factor (VIF)", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("VIF", justify="right")
     table.add_column("Multicollinearity Risk", justify="left")
 
     for _, row in vif_df.iterrows():
         vif: float = row["vif"]
         if vif >= VIF_HIGH_THRESHOLD:
-            risk = "[red]High[/red]"
+            risk = "[bright_red]High[/bright_red]"
         elif vif >= VIF_MODERATE_THRESHOLD:
-            risk = "[yellow]Moderate[/yellow]"
+            risk = "[bright_yellow]Moderate[/bright_yellow]"
         else:
-            risk = "[green]Low[/green]"
+            risk = "[bright_green]Low[/bright_green]"
         table.add_row(str(row["feature"]), f"{vif:.4f}", risk)
 
     console.print(table)
@@ -43,15 +43,15 @@ def report_vif(vif_df: pd.DataFrame) -> None:
 
     if not high_vif.empty:
         features = ", ".join(high_vif["feature"].tolist())
-        console.print(f"\n[bold red]High multicollinearity (VIF ≥ {VIF_HIGH_THRESHOLD}):[/bold red] {features}")
+        console.print(f"\n[bold bright_red]High multicollinearity (VIF ≥ {VIF_HIGH_THRESHOLD}):[/bold bright_red] {features}")
         console.print("[dim]These predictors share substantial variance with others — regularization will shrink or eliminate them.[/dim]")
 
     if not moderate_vif.empty:
         features = ", ".join(moderate_vif["feature"].tolist())
-        console.print(f"\n[bold yellow]Moderate multicollinearity (VIF ≥ {VIF_MODERATE_THRESHOLD}):[/bold yellow] {features}")
+        console.print(f"\n[bold bright_yellow]Moderate multicollinearity (VIF ≥ {VIF_MODERATE_THRESHOLD}):[/bold bright_yellow] {features}")
 
     if high_vif.empty and moderate_vif.empty:
-        console.print("\n[green]No significant multicollinearity detected.[/green]")
+        console.print("\n[bright_green]No significant multicollinearity detected.[/bright_green]")
 
 
 def main() -> None:

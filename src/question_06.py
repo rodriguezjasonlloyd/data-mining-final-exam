@@ -17,7 +17,7 @@ def report_metrics(artifacts: ModelArtifacts) -> np.ndarray:
     accuracy = accuracy_score(artifacts.y_test, y_prediction)
 
     table = Table(title="Classification Report", show_lines=True)
-    table.add_column("Class", style="cyan")
+    table.add_column("Class", style="bright_cyan")
     table.add_column("Precision", justify="right")
     table.add_column("Recall", justify="right")
     table.add_column("F1-Score", justify="right")
@@ -45,7 +45,7 @@ def report_metrics(artifacts: ModelArtifacts) -> np.ndarray:
 
     console.print(table)
     console.print(f"\n[bold]Accuracy:[/bold] {accuracy:.4f}")
-    console.print("\n[bold]Most important metric:[/bold] [yellow]Recall (Left)[/yellow] — missing an employee who will leave is more costly than a false alarm.")
+    console.print("\n[bold]Most important metric:[/bold] [bright_yellow]Recall (Left)[/bright_yellow] — missing an employee who will leave is more costly than a false alarm.")
 
     return y_prediction
 

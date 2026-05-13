@@ -29,7 +29,7 @@ def find_optimal_depth(curve: pd.DataFrame) -> int:
 
 def report_depth_curve(curve: pd.DataFrame, optimal_depth: int) -> None:
     table = Table(title="Tree Depth vs Accuracy — Training and Testing", show_lines=True)
-    table.add_column("Depth", style="cyan", justify="right")
+    table.add_column("Depth", style="bright_cyan", justify="right")
     table.add_column("Training Accuracy", justify="right")
     table.add_column("Testing Accuracy", justify="right")
     table.add_column("Train-Test Gap", justify="right")
@@ -41,8 +41,8 @@ def report_depth_curve(curve: pd.DataFrame, optimal_depth: int) -> None:
         testing_accuracy: float = row["testing_accuracy"]
         gap: float = training_accuracy - testing_accuracy
 
-        gap_color = "red" if gap > 0.05 else "yellow" if gap > 0.02 else "green"
-        note = "[bold green]★ Optimal[/bold green]" if depth == optimal_depth else ""
+        gap_color = "bright_red" if gap > 0.05 else "bright_yellow" if gap > 0.02 else "bright_green"
+        note = "[bold bright_green]★ Optimal[/bold bright_green]" if depth == optimal_depth else ""
 
         table.add_row(
             str(depth),
@@ -68,7 +68,7 @@ def report_tradeoff_analysis(curve: pd.DataFrame, optimal_depth: int) -> None:
 
     console.print(
         Panel(
-            f"[bold]Optimal depth:[/bold] [green]{optimal_depth}[/green]  "
+            f"[bold]Optimal depth:[/bold] [bright_green]{optimal_depth}[/bright_green]  "
             f"[bold]Testing accuracy at optimal:[/bold] {optimal_row['testing_accuracy']:.4f}  "
             f"[bold]Training accuracy at optimal:[/bold] {optimal_row['training_accuracy']:.4f}\n\n"
             f"[bold]Underfitting zone:[/bold] {underfitting_range} — low depth limits the tree's ability to capture "

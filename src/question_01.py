@@ -158,13 +158,13 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
 
 def report_missing(missing_df: pd.DataFrame) -> None:
     table = Table(title="Missing Values", show_lines=True)
-    table.add_column("Column", style="cyan")
+    table.add_column("Column", style="bright_cyan")
     table.add_column("Missing Count", justify="right")
     table.add_column("Missing %", justify="right")
 
     for column, row in missing_df.iterrows():
         pct = row["missing_pct"]
-        color = "red" if pct > 5 else "yellow" if pct > 2 else "green"
+        color = "bright_red" if pct > 5 else "bright_yellow" if pct > 2 else "bright_green"
         table.add_row(str(column), str(int(row["missing_count"])), f"[{color}]{pct:.2f}%[/{color}]")
 
     console.print(table)
@@ -172,7 +172,7 @@ def report_missing(missing_df: pd.DataFrame) -> None:
 
 def report_suspicious(suspicious: dict[str, pd.DataFrame]) -> None:
     table = Table(title="Suspicious Values", show_lines=True)
-    table.add_column("Field", style="cyan")
+    table.add_column("Field", style="bright_cyan")
     table.add_column("Count", justify="right")
     table.add_column("Decision", style="dim")
 
@@ -188,7 +188,7 @@ def report_suspicious(suspicious: dict[str, pd.DataFrame]) -> None:
 
     for key, flagged in suspicious.items():
         count = len(flagged)
-        color = "red" if count > 0 else "green"
+        color = "bright_red" if count > 0 else "bright_green"
         table.add_row(key, f"[{color}]{count}[/{color}]", decisions[key])
 
     console.print(table)
@@ -196,14 +196,14 @@ def report_suspicious(suspicious: dict[str, pd.DataFrame]) -> None:
 
 def report_dropped(dropped: pd.DataFrame) -> None:
     if dropped.empty:
-        console.print("[green]No rows dropped.[/green]")
+        console.print("[bright_green]No rows dropped.[/bright_green]")
         return
 
     table = Table(title=f"Rows to be Dropped ({len(dropped)} total)", show_lines=True)
-    table.add_column("Employee_ID", style="cyan")
+    table.add_column("Employee_ID", style="bright_cyan")
     table.add_column("Age", justify="right")
     table.add_column("Monthly_Salary_PHP", justify="right")
-    table.add_column("Reason", style="red")
+    table.add_column("Reason", style="bright_red")
 
     for _, row in dropped.iterrows():
         reasons = []
@@ -224,12 +224,12 @@ def report_departments(departments: pd.Series) -> None:
     unmapped = [str(name) for name in departments.index if str(name) not in DEPARTMENT_MAP]
     status = "Fully Mapped" if not unmapped else f"Unmapped: {', '.join(unmapped)}"
     table = Table(title=f"Department Name Variants ({status})", show_lines=True)
-    table.add_column("Raw Value", style="cyan")
+    table.add_column("Raw Value", style="bright_cyan")
     table.add_column("Count", justify="right")
-    table.add_column("Maps To", style="green")
+    table.add_column("Maps To", style="bright_green")
 
     for name, count in departments.items():
-        canonical = DEPARTMENT_MAP.get(str(name), "[red]UNMAPPED[/red]")
+        canonical = DEPARTMENT_MAP.get(str(name), "[bright_red]UNMAPPED[/bright_red]")
         table.add_row(str(name), str(count), canonical)
 
     console.print(table)
@@ -238,7 +238,7 @@ def report_departments(departments: pd.Series) -> None:
 def report_categoricals(cats: dict[str, pd.Series]) -> None:
     for column, counts in cats.items():
         table = Table(title=f"{column} Distribution", show_lines=True)
-        table.add_column("Value", style="cyan")
+        table.add_column("Value", style="bright_cyan")
         table.add_column("Count", justify="right")
         for val, count in counts.items():
             table.add_row(str(val), str(count))
@@ -303,10 +303,10 @@ def main() -> None:
 
     console.print(
         Panel(
-            f"[green]Cleaned dataset:[/green] {clean_df.shape[0]} rows x {clean_df.shape[1]} columns\n"
-            f"[red]Rows removed:[/red] {df.shape[0] - clean_df.shape[0]} (impossible age/salary values)\n"
-            f"[yellow]Age threshold:[/yellow] [{AGE_MIN}, {AGE_MAX}]\n"
-            f"[yellow]Salary threshold:[/yellow] (0, {SALARY_MAX:,}]",
+            f"[bright_green]Cleaned dataset:[/bright_green] {clean_df.shape[0]} rows x {clean_df.shape[1]} columns\n"
+            f"[bright_red]Rows removed:[/bright_red] {df.shape[0] - clean_df.shape[0]} (impossible age/salary values)\n"
+            f"[bright_yellow]Age threshold:[/bright_yellow] [{AGE_MIN}, {AGE_MAX}]\n"
+            f"[bright_yellow]Salary threshold:[/bright_yellow] (0, {SALARY_MAX:,}]",
             title="Cleaning Summary",
         ),
     )

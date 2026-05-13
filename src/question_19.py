@@ -82,7 +82,7 @@ def train_elastic_net(ols_artifacts: OLSArtifacts) -> ElasticNetArtifacts:
 
 def report_metrics(elastic_net_artifacts: ElasticNetArtifacts) -> None:
     table = Table(title="Elastic Net Regression — Performance Metrics", show_lines=True)
-    table.add_column("Metric", style="cyan")
+    table.add_column("Metric", style="bright_cyan")
     table.add_column("Value", justify="right")
 
     table.add_row("Optimal λ (alpha)", f"{elastic_net_artifacts.optimal_alpha:.4f}")
@@ -97,7 +97,7 @@ def report_metrics(elastic_net_artifacts: ElasticNetArtifacts) -> None:
     console.print(table)
 
     gap: float = elastic_net_artifacts.train_r2 - elastic_net_artifacts.test_r2
-    color = "red" if gap > 0.05 else "green"
+    color = "bright_red" if gap > 0.05 else "bright_green"
     console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
 
 
@@ -120,11 +120,11 @@ def report_coefficient_comparison(
     comparison = comparison.sort_values("OLS", key=abs, ascending=False)
 
     table = Table(title="Coefficient Comparison: OLS vs Ridge vs Lasso vs Elastic Net", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("OLS", justify="right")
-    table.add_column("Ridge", justify="right", style="yellow")
+    table.add_column("Ridge", justify="right", style="bright_yellow")
     table.add_column("Lasso", justify="right", style="magenta")
-    table.add_column("Elastic Net", justify="right", style="green")
+    table.add_column("Elastic Net", justify="right", style="bright_green")
 
     for feature, row in comparison.iterrows():
         lasso_display = "[dim]0.00[/dim]" if row["Lasso"] == 0.0 else f"{row['Lasso']:,.2f}"
@@ -143,8 +143,8 @@ def report_coefficient_comparison(
     retained_features = comparison[comparison["ElasticNet"] != 0].index.tolist()
 
     if zeroed_features:
-        console.print(f"\n[bold red]Elastic Net eliminated ({len(zeroed_features)}):[/bold red] {', '.join(zeroed_features)}")
-    console.print(f"[bold green]Retained ({len(retained_features)}):[/bold green] {', '.join(retained_features)}")
+        console.print(f"\n[bold bright_red]Elastic Net eliminated ({len(zeroed_features)}):[/bold bright_red] {', '.join(zeroed_features)}")
+    console.print(f"[bold bright_green]Retained ({len(retained_features)}):[/bold bright_green] {', '.join(retained_features)}")
     console.print("[dim]Elastic Net blends L1 and L2 penalties — it selects features like Lasso while handling correlated predictors more stably like Ridge.[/dim]")
 
 
@@ -156,10 +156,10 @@ def report_model_comparison(
     ridge_nonzero_count: int = int((ridge_artifacts.coefficients != 0).sum())
 
     table = Table(title="Regularized Regression Comparison: Ridge vs Lasso vs Elastic Net", show_lines=True)
-    table.add_column("Metric", style="cyan")
-    table.add_column("Ridge", justify="right", style="yellow")
+    table.add_column("Metric", style="bright_cyan")
+    table.add_column("Ridge", justify="right", style="bright_yellow")
     table.add_column("Lasso", justify="right", style="magenta")
-    table.add_column("Elastic Net", justify="right", style="green")
+    table.add_column("Elastic Net", justify="right", style="bright_green")
 
     table.add_row("Train R²", f"{ridge_artifacts.train_r2:.4f}", f"{lasso_artifacts.train_r2:.4f}", f"{elastic_net_artifacts.train_r2:.4f}")
     table.add_row("Test R²", f"{ridge_artifacts.test_r2:.4f}", f"{lasso_artifacts.test_r2:.4f}", f"{elastic_net_artifacts.test_r2:.4f}")

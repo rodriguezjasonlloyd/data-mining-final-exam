@@ -82,7 +82,7 @@ def report_comparison_table(comparison: pd.DataFrame) -> None:
     best_rmse_model: str = str(comparison["Test RMSE"].idxmin())
 
     table = Table(title="Regression Model Comparison — OLS vs Ridge vs Lasso vs Elastic Net", show_lines=True)
-    table.add_column("Model", style="cyan")
+    table.add_column("Model", style="bright_cyan")
     table.add_column("Test R²", justify="right")
     table.add_column("Test RMSE", justify="right")
     table.add_column("Non-Zero Coefficients", justify="right")
@@ -90,8 +90,8 @@ def report_comparison_table(comparison: pd.DataFrame) -> None:
     table.add_column("L1 Ratio", justify="right")
 
     for model_name, row in comparison.iterrows():
-        r2_color = "bold green" if model_name == best_r2_model else ""
-        rmse_color = "bold green" if model_name == best_rmse_model else ""
+        r2_color = "bold bright_green" if model_name == best_r2_model else ""
+        rmse_color = "bold bright_green" if model_name == best_rmse_model else ""
 
         optimal_lambda = row["Optimal λ"]
         l1_ratio = row["L1 Ratio"]
@@ -112,7 +112,7 @@ def report_comparison_table(comparison: pd.DataFrame) -> None:
         )
 
     console.print(table)
-    console.print(f"[dim]Bold green = best value. Best R²: {best_r2_model}. Best RMSE: {best_rmse_model}.[/dim]")
+    console.print(f"[dim]Bold bright_green = best value. Best R²: {best_r2_model}. Best RMSE: {best_rmse_model}.[/dim]")
 
 
 def report_recommendation(comparison: pd.DataFrame) -> None:
@@ -126,13 +126,13 @@ def report_recommendation(comparison: pd.DataFrame) -> None:
     total_features: int = int(comparison["Non-Zero Coefficients"].max())
 
     recommendation = (
-        f"[bold]Recommended model:[/bold] [green]{best_r2_model}[/green]\n\n"
+        f"[bold]Recommended model:[/bold] [bright_green]{best_r2_model}[/bright_green]\n\n"
         f"[bold]Justification:[/bold]\n"
-        f"• [bold]{best_r2_model}[/bold] achieves the highest test R² of [cyan]{best_r2:.4f}[/cyan] "
-        f"and the lowest test RMSE of [cyan]{best_rmse:,.2f} PHP[/cyan], indicating the strongest "
+        f"• [bold]{best_r2_model}[/bold] achieves the highest test R² of [bright_cyan]{best_r2:.4f}[/bright_cyan] "
+        f"and the lowest test RMSE of [bright_cyan]{best_rmse:,.2f} PHP[/bright_cyan], indicating the strongest "
         f"out-of-sample predictive performance for monthly salary benchmarking.\n"
-        f"• Lasso reduces the model to [cyan]{lasso_nonzero}[/cyan] of {total_features} features, "
-        f"while Elastic Net retains [cyan]{elastic_net_nonzero}[/cyan] — both enable interpretable, "
+        f"• Lasso reduces the model to [bright_cyan]{lasso_nonzero}[/bright_cyan] of {total_features} features, "
+        f"while Elastic Net retains [bright_cyan]{elastic_net_nonzero}[/bright_cyan] — both enable interpretable, "
         f"parsimonious salary models suited for HR reporting.\n"
         f"• Ridge retains all features and is preferred when multicollinearity is severe, "
         f"but offers no automatic feature selection.\n"

@@ -83,7 +83,7 @@ def report_clusters(sample_df: pd.DataFrame, cluster_labels: pd.Series) -> None:
     profile_df["Cluster"] = cluster_labels
 
     table = Table(title=f"Cluster Profiles — {LINKAGE_METHOD.title()} Linkage ({DISTANCE_METRIC.title()})", show_lines=True)
-    table.add_column("Cluster", style="cyan")
+    table.add_column("Cluster", style="bright_cyan")
     table.add_column("Size", justify="right")
     table.add_column("Attrition %", justify="right")
     table.add_column("Avg Salary", justify="right")
@@ -94,7 +94,7 @@ def report_clusters(sample_df: pd.DataFrame, cluster_labels: pd.Series) -> None:
     for cluster_id in sorted(profile_df["Cluster"].unique()):
         group = profile_df[profile_df["Cluster"] == cluster_id]
         attrition_pct: float = group["Attrition"].mean() * 100
-        color = "red" if attrition_pct > 40 else "yellow" if attrition_pct > 20 else "green"
+        color = "bright_red" if attrition_pct > 40 else "bright_yellow" if attrition_pct > 20 else "bright_green"
 
         table.add_row(
             str(cluster_id),

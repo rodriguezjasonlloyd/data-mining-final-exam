@@ -72,7 +72,7 @@ def train_ridge(ols_artifacts: OLSArtifacts) -> RidgeArtifacts:
 
 def report_metrics(ridge_artifacts: RidgeArtifacts) -> None:
     table = Table(title="Ridge Regression — Performance Metrics", show_lines=True)
-    table.add_column("Metric", style="cyan")
+    table.add_column("Metric", style="bright_cyan")
     table.add_column("Value", justify="right")
 
     table.add_row("Optimal λ (alpha)", f"{ridge_artifacts.optimal_alpha:.4f}")
@@ -84,7 +84,7 @@ def report_metrics(ridge_artifacts: RidgeArtifacts) -> None:
     console.print(table)
 
     gap: float = ridge_artifacts.train_r2 - ridge_artifacts.test_r2
-    color = "red" if gap > 0.05 else "green"
+    color = "bright_red" if gap > 0.05 else "bright_green"
     console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
 
 
@@ -97,14 +97,14 @@ def report_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: 
     comparison = comparison.sort_values("Shrinkage", ascending=False)
 
     table = Table(title="OLS vs Ridge Coefficient Comparison", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("OLS Coefficient", justify="right")
     table.add_column("Ridge Coefficient", justify="right")
     table.add_column("Shrinkage", justify="right")
 
     for feature, row in comparison.iterrows():
         shrinkage: float = row["Shrinkage"]
-        color = "red" if shrinkage > 1000 else "yellow" if shrinkage > 100 else "green"
+        color = "bright_red" if shrinkage > 1000 else "bright_yellow" if shrinkage > 100 else "bright_green"
         table.add_row(
             str(feature),
             f"{row['OLS']:,.2f}",
@@ -114,7 +114,7 @@ def report_coefficient_comparison(ols_artifacts: OLSArtifacts, ridge_artifacts: 
 
     console.print(table)
     most_shrunk: str = str(comparison.index[0])
-    console.print(f"\n[bold]Most shrunk feature:[/bold] [yellow]{most_shrunk}[/yellow] (shrinkage={comparison.iloc[0]['Shrinkage']:,.2f})")
+    console.print(f"\n[bold]Most shrunk feature:[/bold] [bright_yellow]{most_shrunk}[/bright_yellow] (shrinkage={comparison.iloc[0]['Shrinkage']:,.2f})")
     console.print("[dim]Ridge shrinks all coefficients toward zero but retains all features — no coefficient reaches exactly zero.[/dim]")
 
 

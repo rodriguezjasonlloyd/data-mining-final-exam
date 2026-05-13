@@ -100,7 +100,7 @@ def report_decision_path(steps: list[dict[str, str | float]]) -> None:
     table = Table(title="Decision Path — Hypothetical Employee", show_lines=True)
     table.add_column("Node", justify="right", style="dim")
     table.add_column("Type", justify="left")
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("Threshold", justify="right")
     table.add_column("Employee Value", justify="right")
     table.add_column("Direction", justify="left")
@@ -113,7 +113,7 @@ def report_decision_path(steps: list[dict[str, str | float]]) -> None:
 
         if node_type == "leaf":
             final_prediction = prediction
-            color = "red" if prediction == "Left" else "green"
+            color = "bright_red" if prediction == "Left" else "bright_green"
             table.add_row(
                 str(step["node"]),
                 f"[{color}]leaf[/{color}]",
@@ -136,7 +136,7 @@ def report_decision_path(steps: list[dict[str, str | float]]) -> None:
 
     console.print(table)
 
-    color = "red" if final_prediction == "Left" else "green"
+    color = "bright_red" if final_prediction == "Left" else "bright_green"
     console.print(f"\n[bold]Final prediction:[/bold] [{color}]{final_prediction}[/{color}]")
     console.print("[dim]Interpretation: the pruned tree traverses each split using the employee's feature values until reaching a leaf node, where the majority class determines the prediction.[/dim]")
 

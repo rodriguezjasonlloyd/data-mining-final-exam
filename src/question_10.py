@@ -53,7 +53,7 @@ def report_standardization(df: pd.DataFrame, artifacts: ScalerArtifacts) -> None
     scaled_df = pd.DataFrame(artifacts.scaled_features, columns=artifacts.feature_names)
 
     table = Table(title="Standardization Summary (Z-Score)", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("Original Mean", justify="right")
     table.add_column("Original Std", justify="right")
     table.add_column("Scaled Mean", justify="right")

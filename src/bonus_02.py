@@ -92,8 +92,8 @@ def report_skipped_combinations() -> None:
 
 def report_comparison(results: list[CombinationResult]) -> None:
     table = Table(title=f"Clustering Method Comparison (n={SAMPLE_SIZE}, k={NUM_CLUSTERS})", show_lines=True)
-    table.add_column("Linkage", style="cyan")
-    table.add_column("Distance", style="cyan")
+    table.add_column("Linkage", style="bright_cyan")
+    table.add_column("Distance", style="bright_cyan")
     table.add_column("Cluster Sizes", justify="right")
     table.add_column("Balance Ratio", justify="right")
     table.add_column("Silhouette Score", justify="right")
@@ -102,8 +102,8 @@ def report_comparison(results: list[CombinationResult]) -> None:
 
     for result in results:
         sizes_str: str = " / ".join(str(result.cluster_sizes[k]) for k in sorted(result.cluster_sizes))
-        silhouette_color = "green" if result.silhouette == best_silhouette else "yellow" if result.silhouette > 0.15 else "red"
-        balance_color = "green" if result.balance_ratio < 2.0 else "yellow" if result.balance_ratio < 4.0 else "red"
+        silhouette_color = "bright_green" if result.silhouette == best_silhouette else "bright_yellow" if result.silhouette > 0.15 else "bright_red"
+        balance_color = "bright_green" if result.balance_ratio < 2.0 else "bright_yellow" if result.balance_ratio < 4.0 else "bright_red"
 
         table.add_row(
             result.linkage_method.title(),
@@ -123,7 +123,7 @@ def report_recommendation(results: list[CombinationResult]) -> None:
 
     console.print(
         Panel(
-            f"[bold]Recommended setup:[/bold] [green]{best.linkage_method.title()} Linkage + {best.distance_metric.title()} Distance[/green]\n\n"
+            f"[bold]Recommended setup:[/bold] [bright_green]{best.linkage_method.title()} Linkage + {best.distance_metric.title()} Distance[/bright_green]\n\n"
             f"[bold]Silhouette score:[/bold] {best.silhouette:.4f} — highest among all valid combinations, "
             f"indicating the most cohesive and well-separated clusters.\n\n"
             f"[bold]Balance ratio:[/bold] {best.balance_ratio:.2f} — cluster sizes ({sizes_str}) are "

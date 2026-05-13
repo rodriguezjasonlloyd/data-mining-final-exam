@@ -26,7 +26,7 @@ def compute_importance(artifacts: ModelArtifacts) -> pd.DataFrame:
 def report_importance(importance_df: pd.DataFrame) -> None:
     table = Table(title=f"Top {TOP_N} Feature Importances", show_lines=True)
     table.add_column("Rank", justify="right", style="dim")
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("Importance %", justify="right")
     table.add_column("Bar", justify="left")
 
@@ -35,7 +35,7 @@ def report_importance(importance_df: pd.DataFrame) -> None:
     for rank, (_, row) in enumerate(importance_df.iterrows(), start=1):
         pct: float = row["importance_pct"]
         bar = "█" * int((pct / max_pct) * 20)
-        color = "green" if pct >= 10 else "yellow" if pct >= 5 else "dim"
+        color = "bright_green" if pct >= 10 else "bright_yellow" if pct >= 5 else "dim"
         table.add_row(str(rank), str(row["feature"]), f"[{color}]{pct:.2f}%[/{color}]", f"[{color}]{bar}[/{color}]")
 
     console.print(table)

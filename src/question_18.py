@@ -75,7 +75,7 @@ def train_lasso(ols_artifacts: OLSArtifacts) -> LassoArtifacts:
 
 def report_metrics(lasso_artifacts: LassoArtifacts) -> None:
     table = Table(title="Lasso Regression — Performance Metrics", show_lines=True)
-    table.add_column("Metric", style="cyan")
+    table.add_column("Metric", style="bright_cyan")
     table.add_column("Value", justify="right")
 
     table.add_row("Optimal λ (alpha)", f"{lasso_artifacts.optimal_alpha:.4f}")
@@ -89,7 +89,7 @@ def report_metrics(lasso_artifacts: LassoArtifacts) -> None:
     console.print(table)
 
     gap: float = lasso_artifacts.train_r2 - lasso_artifacts.test_r2
-    color = "red" if gap > 0.05 else "green"
+    color = "bright_red" if gap > 0.05 else "bright_green"
     console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
 
 
@@ -102,14 +102,14 @@ def report_coefficient_sparsity(ols_artifacts: OLSArtifacts, lasso_artifacts: La
     comparison = comparison.sort_values("OLS", key=abs, ascending=False)
 
     table = Table(title="OLS vs Lasso Coefficient Comparison", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("OLS Coefficient", justify="right")
     table.add_column("Lasso Coefficient", justify="right")
     table.add_column("Eliminated", justify="right")
 
     for feature, row in comparison.iterrows():
         zeroed: bool = row["Zeroed"]
-        color = "red" if zeroed else "green"
+        color = "bright_red" if zeroed else "bright_green"
         table.add_row(
             str(feature),
             f"{row['OLS']:,.2f}",
@@ -123,8 +123,8 @@ def report_coefficient_sparsity(ols_artifacts: OLSArtifacts, lasso_artifacts: La
     retained_features = comparison[~comparison["Zeroed"]].index.tolist()
 
     if zeroed_features:
-        console.print(f"\n[bold red]Eliminated features ({len(zeroed_features)}):[/bold red] {', '.join(zeroed_features)}")
-    console.print(f"[bold green]Retained features ({len(retained_features)}):[/bold green] {', '.join(retained_features)}")
+        console.print(f"\n[bold bright_red]Eliminated features ({len(zeroed_features)}):[/bold bright_red] {', '.join(zeroed_features)}")
+    console.print(f"[bold bright_green]Retained features ({len(retained_features)}):[/bold bright_green] {', '.join(retained_features)}")
     console.print("[dim]Lasso's L1 penalty drives weak predictors to exactly zero, performing implicit feature selection.[/dim]")
 
 

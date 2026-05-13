@@ -34,7 +34,7 @@ def compute_skewness(df: pd.DataFrame) -> pd.Series:
 
 def report_summary(summary: pd.DataFrame) -> None:
     table = Table(title="Descriptive Statistics", show_lines=True)
-    table.add_column("Variable", style="cyan")
+    table.add_column("Variable", style="bright_cyan")
     for col in summary.columns:
         table.add_column(col, justify="right")
 
@@ -46,12 +46,12 @@ def report_summary(summary: pd.DataFrame) -> None:
 
 def report_skewness(skewness: pd.Series) -> None:
     table = Table(title="Skewness — All Numeric Variables", show_lines=True)
-    table.add_column("Variable", style="cyan")
+    table.add_column("Variable", style="bright_cyan")
     table.add_column("Skewness", justify="right")
     table.add_column("Direction", justify="right")
 
     for variable, value in skewness.items():
-        direction = "[red]positive[/red]" if value > 0 else "[blue]negative[/blue]"
+        direction = "[bright_red]positive[/bright_red]" if value > 0 else "[bright_blue]negative[/bright_blue]"
         highlight = "[bold]" if variable in skewness.head(3).index else ""
         table.add_row(f"{highlight}{variable}", f"{highlight}{value:.4f}", direction)
 

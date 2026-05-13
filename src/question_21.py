@@ -50,7 +50,7 @@ def identify_high_risk(master: pd.DataFrame, flight_risk_ids: set[str]) -> pd.Da
 
 def report_high_risk(high_risk: pd.DataFrame) -> None:
     table = Table(title=f"Top {TOP_N} High-Risk Employees — DT Predicted Leave + Flight Risk Cluster", show_lines=True)
-    table.add_column("Employee_ID", style="cyan")
+    table.add_column("Employee_ID", style="bright_cyan")
     table.add_column("Actual Salary (PHP)", justify="right")
     table.add_column("Predicted Salary (PHP)", justify="right")
     table.add_column("Salary Gap (PHP)", justify="right")
@@ -58,7 +58,7 @@ def report_high_risk(high_risk: pd.DataFrame) -> None:
 
     for _, row in high_risk.iterrows():
         gap: float = row["salary_gap"]
-        gap_color = "red" if gap < -5000 else "yellow" if gap < 0 else "green"
+        gap_color = "bright_red" if gap < -5000 else "bright_yellow" if gap < 0 else "bright_green"
         table.add_row(
             str(row["Employee_ID"]),
             f"{row['Monthly_Salary_PHP']:,.0f}",
@@ -77,11 +77,11 @@ def report_salary_summary(high_risk: pd.DataFrame) -> None:
     avg_actual: float = float(high_risk["Monthly_Salary_PHP"].mean())
     avg_predicted: float = float(high_risk["predicted_salary"].mean())
 
-    gap_color = "red" if avg_gap < 0 else "green"
+    gap_color = "bright_red" if avg_gap < 0 else "bright_green"
 
     summary = (
         f"[bold]Employees analyzed:[/bold] {len(high_risk)}\n"
-        f"[bold]Underpaid (actual < predicted):[/bold] [red]{underpaid_count}[/red] of {len(high_risk)}\n"
+        f"[bold]Underpaid (actual < predicted):[/bold] [bright_red]{underpaid_count}[/bright_red] of {len(high_risk)}\n"
         f"[bold]Average actual salary:[/bold] PHP {avg_actual:,.0f}\n"
         f"[bold]Average predicted salary:[/bold] PHP {avg_predicted:,.0f}\n"
         f"[bold]Average salary gap:[/bold] [{gap_color}]PHP {avg_gap:+,.0f}[/{gap_color}]\n\n"

@@ -39,7 +39,7 @@ def report_pruned(artifacts: ModelArtifacts, curve: pd.DataFrame) -> None:
     pruned_row = curve[curve["depth"] == PRUNED_DEPTH].iloc[0]
 
     table = Table(title="Unpruned vs Pruned Decision Tree", show_lines=True)
-    table.add_column("Model", style="cyan")
+    table.add_column("Model", style="bright_cyan")
     table.add_column("Max Depth", justify="right")
     table.add_column("Leaf Nodes", justify="right")
     table.add_column("Train Acc", justify="right")
@@ -64,7 +64,7 @@ def report_pruned(artifacts: ModelArtifacts, curve: pd.DataFrame) -> None:
 
     gap_unpruned: float = unpruned_row["train_accuracy"] - unpruned_row["test_accuracy"]
     gap_pruned: float = pruned_row["train_accuracy"] - pruned_row["test_accuracy"]
-    console.print(f"\n[bold]Train-Test gap:[/bold] unpruned=[red]{gap_unpruned:.4f}[/red]  pruned=[green]{gap_pruned:.4f}[/green]")
+    console.print(f"\n[bold]Train-Test gap:[/bold] unpruned=[bright_red]{gap_unpruned:.4f}[/bright_red]  pruned=[bright_green]{gap_pruned:.4f}[/bright_green]")
     console.print("[dim]A smaller gap indicates reduced overfitting.[/dim]")
 
 

@@ -197,7 +197,7 @@ def report_engineered_features() -> None:
 
 def report_tree_comparison(comparison: TreeComparison) -> None:
     table = Table(title="Decision Tree — Before vs After Feature Engineering", show_lines=True)
-    table.add_column("Metric", style="cyan")
+    table.add_column("Metric", style="bright_cyan")
     table.add_column("Baseline", justify="right")
     table.add_column("With Engineered Features", justify="right")
     table.add_column("Δ Change", justify="right")
@@ -205,8 +205,8 @@ def report_tree_comparison(comparison: TreeComparison) -> None:
     accuracy_delta: float = comparison.engineered_accuracy - comparison.baseline_accuracy
     f1_delta: float = comparison.engineered_f1 - comparison.baseline_f1
 
-    accuracy_color = "green" if accuracy_delta >= 0 else "red"
-    f1_color = "green" if f1_delta >= 0 else "red"
+    accuracy_color = "bright_green" if accuracy_delta >= 0 else "bright_red"
+    f1_color = "bright_green" if f1_delta >= 0 else "bright_red"
 
     table.add_row(
         "Test Accuracy",
@@ -226,7 +226,7 @@ def report_tree_comparison(comparison: TreeComparison) -> None:
 
 def report_regression_comparison(comparisons: list[RegressionComparison]) -> None:
     table = Table(title="Regression — Before vs After Feature Engineering", show_lines=True)
-    table.add_column("Model", style="cyan")
+    table.add_column("Model", style="bright_cyan")
     table.add_column("Baseline R²", justify="right")
     table.add_column("Engineered R²", justify="right")
     table.add_column("Δ R²", justify="right")
@@ -239,8 +239,8 @@ def report_regression_comparison(comparisons: list[RegressionComparison]) -> Non
     for comp in comparisons:
         r2_delta: float = comp.engineered_test_r2 - comp.baseline_test_r2
         rmse_delta: float = comp.engineered_test_rmse - comp.baseline_test_rmse
-        r2_color = "green" if r2_delta >= 0 else "red"
-        rmse_color = "green" if rmse_delta <= 0 else "red"
+        r2_color = "bright_green" if r2_delta >= 0 else "bright_red"
+        rmse_color = "bright_green" if rmse_delta <= 0 else "bright_red"
 
         table.add_row(
             comp.model_name,

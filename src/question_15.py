@@ -91,7 +91,7 @@ def compute_metrics(artifacts: OLSArtifacts) -> dict[str, float]:
 
 def report_metrics(metrics: dict[str, float]) -> None:
     table = Table(title="OLS Regression — Performance Metrics", show_lines=True)
-    table.add_column("Metric", style="cyan")
+    table.add_column("Metric", style="bright_cyan")
     table.add_column("Value", justify="right")
 
     table.add_row("Train R²", f"{metrics['train_r2']:.4f}")
@@ -103,7 +103,7 @@ def report_metrics(metrics: dict[str, float]) -> None:
     console.print(table)
 
     gap: float = metrics["train_r2"] - metrics["test_r2"]
-    color = "red" if gap > 0.05 else "green"
+    color = "bright_red" if gap > 0.05 else "bright_green"
     console.print(f"\n[bold]Train-Test R² gap:[/bold] [{color}]{gap:.4f}[/{color}]")
     console.print("[dim]A gap > 0.05 suggests overfitting.[/dim]")
 
@@ -113,7 +113,7 @@ def report_statsmodels_summary(x_train: pd.DataFrame, y_train: pd.Series) -> Non
     ols_model = sm.OLS(y_train, x_with_constant).fit()
 
     table = Table(title="OLS Coefficients (statsmodels)", show_lines=True)
-    table.add_column("Feature", style="cyan")
+    table.add_column("Feature", style="bright_cyan")
     table.add_column("Coefficient", justify="right")
     table.add_column("Std Error", justify="right")
     table.add_column("t-stat", justify="right")
@@ -126,7 +126,7 @@ def report_statsmodels_summary(x_train: pd.DataFrame, y_train: pd.Series) -> Non
         t_stat: float = ols_model.tvalues[feature]
         p_value: float = ols_model.pvalues[feature]
         significant: bool = p_value < 0.05
-        color = "green" if significant else "dim"
+        color = "bright_green" if significant else "dim"
         table.add_row(
             str(feature),
             f"[{color}]{coefficient:,.2f}[/{color}]",

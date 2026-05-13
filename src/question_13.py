@@ -42,7 +42,7 @@ def build_profile_frame(artifacts: CompleteLinkageArtifacts) -> pd.DataFrame:
 
 def report_cluster_profiles(profile: pd.DataFrame) -> None:
     table = Table(title="Cluster Profiles — Complete Linkage with Descriptive Names", show_lines=True)
-    table.add_column("Cluster", style="cyan")
+    table.add_column("Cluster", style="bright_cyan")
     table.add_column("Name", style="bold")
     table.add_column("Size", justify="right")
     table.add_column("Attrition %", justify="right")
@@ -55,7 +55,7 @@ def report_cluster_profiles(profile: pd.DataFrame) -> None:
     for cluster_id in sorted(profile["Cluster"].unique()):
         group = profile[profile["Cluster"] == cluster_id]
         attrition_pct: float = group["Attrition"].mean() * 100
-        color = "red" if attrition_pct > 60 else "yellow" if attrition_pct > 40 else "green"
+        color = "bright_red" if attrition_pct > 60 else "bright_yellow" if attrition_pct > 40 else "bright_green"
 
         table.add_row(
             str(cluster_id),
@@ -74,7 +74,7 @@ def report_cluster_profiles(profile: pd.DataFrame) -> None:
 
 def report_interventions(profile: pd.DataFrame) -> None:
     table = Table(title="HR Interventions by Cluster", show_lines=True)
-    table.add_column("Cluster", style="cyan")
+    table.add_column("Cluster", style="bright_cyan")
     table.add_column("Name", style="bold")
     table.add_column("Recommended Intervention")
 

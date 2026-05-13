@@ -18,20 +18,22 @@ def compute_attrition_rate(df: pd.DataFrame, by: str) -> pd.DataFrame:
 
 def report_attrition(rates: pd.DataFrame, by: str) -> None:
     table = Table(title=f"Attrition Rate by {by}", show_lines=True)
-    table.add_column(by, style="cyan")
+    table.add_column(by, style="bright_cyan")
     table.add_column("Total", justify="right")
     table.add_column("Attrition %", justify="right")
     table.add_column("Retained %", justify="right")
 
     for group, row in rates.iterrows():
         pct = row["Attrition_%"]
-        color = "red" if pct > 30 else "yellow" if pct > 15 else "green"
+        color = "bright_red" if pct > 30 else "bright_yellow" if pct > 15 else "bright_green"
         table.add_row(str(group), str(int(row["Total"])), f"[{color}]{pct:.2f}%[/{color}]", f"{row['Retained_%']:.2f}%")
 
     highest = rates.index[0]
     lowest = rates.index[-1]
     console.print(table)
-    console.print(f"  [red]Highest:[/red] {highest} ({rates.loc[highest, 'Attrition_%']:.2f}%)  [green]Lowest:[/green] {lowest} ({rates.loc[lowest, 'Attrition_%']:.2f}%)\n")
+    console.print(
+        f"[bright_red]Highest:[/bright_red] {highest} ({rates.loc[highest, 'Attrition_%']:.2f}%)  [bright_green]Lowest:[/bright_green] {lowest} ({rates.loc[lowest, 'Attrition_%']:.2f}%)\n",
+    )
 
 
 def plot_attrition(df: pd.DataFrame, by: str) -> None:

@@ -73,7 +73,7 @@ def report_tree(artifacts: ModelArtifacts) -> None:
     root_feature = artifacts.x_train.columns[artifacts.model.tree_.feature[0]]
 
     table = Table(title="Decision Tree Structure", show_lines=True)
-    table.add_column("Property", style="cyan")
+    table.add_column("Property", style="bright_cyan")
     table.add_column("Value", justify="right")
 
     table.add_row("Max Depth", str(artifacts.model.get_depth()))
