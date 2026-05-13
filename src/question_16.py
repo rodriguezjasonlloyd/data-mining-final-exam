@@ -12,6 +12,8 @@ from question_15 import get_ols_artifacts
 VIF_HIGH_THRESHOLD = 10.0
 VIF_MODERATE_THRESHOLD = 5.0
 
+TENURE_FLOOR_YEARS = 0.5
+
 
 def compute_vif(x_train: pd.DataFrame) -> pd.DataFrame:
     x_with_constant = sm.add_constant(x_train)
@@ -20,8 +22,15 @@ def compute_vif(x_train: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame({"feature": feature_names, "vif": vif_values}).query("feature != 'const'").sort_values("vif", ascending=False).reset_index(drop=True)
 
 
-def report_vif(vif_df: pd.DataFrame) -> None:
-    table = Table(title="Variance Inflation Factor (VIF)", show_lines=True)
+def engineer_promotion_rate(x_train: pd.DataFrame) -> pd.DataFrame:
+    result = x_train.copy()
+    tenure_floored = result["Tenure_Years"].clip(lower=TENURE_FLOOR_YEARS)
+    result["Promotion_Rate"] = result["Num_Promotions"] / tenure_floored
+    return result.drop(columns=["Tenure_Years", "Num_Promotions"])
+
+
+def report_vif(vif_df: pd.DataFrame, title: str) -> None:
+    table = Table(title=title, show_lines=True)
     table.add_column("Feature", style="bright_cyan")
     table.add_column("VIF", justify="right")
     table.add_column("Multicollinearity Risk", justify="left")
@@ -43,15 +52,14 @@ def report_vif(vif_df: pd.DataFrame) -> None:
 
     if not high_vif.empty:
         features = ", ".join(high_vif["feature"].tolist())
-        console.print(f"\n[bold bright_red]High multicollinearity (VIF ≥ {VIF_HIGH_THRESHOLD}):[/bold bright_red] {features}")
-        console.print("[dim]These predictors share substantial variance with others — regularization will shrink or eliminate them.[/dim]")
+        console.print(f"[bold bright_red]High multicollinearity (VIF ≥ {VIF_HIGH_THRESHOLD}):[/bold bright_red] {features}")
 
     if not moderate_vif.empty:
         features = ", ".join(moderate_vif["feature"].tolist())
-        console.print(f"\n[bold bright_yellow]Moderate multicollinearity (VIF ≥ {VIF_MODERATE_THRESHOLD}):[/bold bright_yellow] {features}")
+        console.print(f"[bold bright_yellow]Moderate multicollinearity (VIF ≥ {VIF_MODERATE_THRESHOLD}):[/bold bright_yellow] {features}")
 
     if high_vif.empty and moderate_vif.empty:
-        console.print("\n[bright_green]No significant multicollinearity detected.[/bright_green]")
+        console.print("[bright_green]No significant multicollinearity detected.[/bright_green]")
 
 
 def main() -> None:
@@ -64,8 +72,14 @@ def main() -> None:
         ),
     )
 
-    vif_df = compute_vif(artifacts.x_train)
-    report_vif(vif_df)
+    vif_before = compute_vif(artifacts.x_train)
+    report_vif(vif_before, "VIF — Before Remediation (Original Features)")
+
+    console.print()
+
+    x_train_remediated = engineer_promotion_rate(artifacts.x_train)
+    vif_after = compute_vif(x_train_remediated)
+    report_vif(vif_after, "VIF — After Remediation (Promotion_Rate)")
 
 
 if __name__ == "__main__":
