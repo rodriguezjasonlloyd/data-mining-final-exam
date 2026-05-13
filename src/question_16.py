@@ -4,6 +4,7 @@ import pandas as pd
 import statsmodels.api as sm
 from rich.panel import Panel
 from rich.table import Table
+from statsmodels.regression.linear_model import RegressionResultsWrapper
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 from question_01 import console
@@ -29,6 +30,11 @@ def engineer_promotion_rate(x_train: pd.DataFrame) -> pd.DataFrame:
     return result.drop(columns=["Tenure_Years", "Num_Promotions"])
 
 
+def fit_ols(x_train: pd.DataFrame, y_train: pd.Series) -> RegressionResultsWrapper:
+    x_with_constant = sm.add_constant(x_train)
+    return sm.OLS(y_train, x_with_constant).fit()
+
+
 def report_vif(vif_df: pd.DataFrame, title: str) -> None:
     table = Table(title=title, show_lines=True)
     table.add_column("Feature", style="bright_cyan")
@@ -45,10 +51,10 @@ def report_vif(vif_df: pd.DataFrame, title: str) -> None:
             risk = "[bright_green]Low[/bright_green]"
         table.add_row(str(row["feature"]), f"{vif:.4f}", risk)
 
-    console.print(table)
-
     high_vif = vif_df[vif_df["vif"] >= VIF_HIGH_THRESHOLD]
     moderate_vif = vif_df[(vif_df["vif"] >= VIF_MODERATE_THRESHOLD) & (vif_df["vif"] < VIF_HIGH_THRESHOLD)]
+
+    console.print(table)
 
     if not high_vif.empty:
         features = ", ".join(high_vif["feature"].tolist())
@@ -60,6 +66,97 @@ def report_vif(vif_df: pd.DataFrame, title: str) -> None:
 
     if high_vif.empty and moderate_vif.empty:
         console.print("[bright_green]No significant multicollinearity detected.[/bright_green]")
+
+
+def report_ols_comparison(original_model: RegressionResultsWrapper, remediated_model: RegressionResultsWrapper) -> None:
+    original_params: pd.Series = original_model.params.drop("const")
+    remediated_params: pd.Series = remediated_model.params.drop("const")
+
+    original_bse: pd.Series = original_model.bse.drop("const")
+    remediated_bse: pd.Series = remediated_model.bse.drop("const")
+
+    original_pvalues: pd.Series = original_model.pvalues.drop("const")
+    remediated_pvalues: pd.Series = remediated_model.pvalues.drop("const")
+
+    shared_features: list[str] = [feature for feature in original_params.index if feature in remediated_params.index]
+    new_features: list[str] = [feature for feature in remediated_params.index if feature not in original_params.index]
+    dropped_features: list[str] = [feature for feature in original_params.index if feature not in remediated_params.index]
+
+    shared_table = Table(title="OLS Comparison — Shared Features (Original vs Remediated)", show_lines=True)
+    shared_table.add_column("Feature", style="bright_cyan")
+    shared_table.add_column("Orig Coef", justify="right")
+    shared_table.add_column("Remed Coef", justify="right")
+    shared_table.add_column("Orig SE", justify="right")
+    shared_table.add_column("Remed SE", justify="right")
+    shared_table.add_column("SE Δ", justify="right")
+    shared_table.add_column("Orig p", justify="right")
+    shared_table.add_column("Remed p", justify="right")
+
+    for feature in shared_features:
+        original_se: float = original_bse[feature]
+        remediated_se: float = remediated_bse[feature]
+        se_delta: float = remediated_se - original_se
+        se_color = "bright_green" if se_delta < 0 else "bright_red" if se_delta > 0 else "dim"
+
+        original_p: float = original_pvalues[feature]
+        remediated_p: float = remediated_pvalues[feature]
+        original_p_color = "bright_green" if original_p < 0.05 else "dim"
+        remediated_p_color = "bright_green" if remediated_p < 0.05 else "dim"
+
+        shared_table.add_row(
+            feature,
+            f"{original_params[feature]:,.2f}",
+            f"{remediated_params[feature]:,.2f}",
+            f"{original_se:,.2f}",
+            f"{remediated_se:,.2f}",
+            f"[{se_color}]{se_delta:+,.2f}[/{se_color}]",
+            f"[{original_p_color}]{original_p:.4f}[/{original_p_color}]",
+            f"[{remediated_p_color}]{remediated_p:.4f}[/{remediated_p_color}]",
+        )
+
+    console.print(shared_table)
+
+    if dropped_features:
+        dropped_table = Table(title="Dropped Features (replaced by Promotion_Rate)", show_lines=True)
+        dropped_table.add_column("Feature", style="bright_red")
+        dropped_table.add_column("Original Coef", justify="right")
+        dropped_table.add_column("Original SE", justify="right")
+        dropped_table.add_column("Original p", justify="right")
+        for feature in dropped_features:
+            dropped_table.add_row(
+                feature,
+                f"{original_params[feature]:,.2f}",
+                f"{original_bse[feature]:,.2f}",
+                f"{original_pvalues[feature]:.4f}",
+            )
+        console.print(dropped_table)
+
+    if new_features:
+        new_table = Table(title="New Features (Promotion_Rate engineered replacement)", show_lines=True)
+        new_table.add_column("Feature", style="bright_green")
+        new_table.add_column("Remediated Coef", justify="right")
+        new_table.add_column("Remediated SE", justify="right")
+        new_table.add_column("Remediated p", justify="right")
+        for feature in new_features:
+            p_color = "bright_green" if remediated_pvalues[feature] < 0.05 else "dim"
+            new_table.add_row(
+                feature,
+                f"{remediated_params[feature]:,.2f}",
+                f"{remediated_bse[feature]:,.2f}",
+                f"[{p_color}]{remediated_pvalues[feature]:.4f}[/{p_color}]",
+            )
+        console.print(new_table)
+
+    original_r2: float = original_model.rsquared
+    remediated_r2: float = remediated_model.rsquared
+    r2_delta: float = remediated_r2 - original_r2
+    r2_color = "bright_green" if abs(r2_delta) <= 0.02 else "bright_yellow" if abs(r2_delta) <= 0.05 else "bright_red"
+
+    console.print(
+        f"\n[bold]R² — Original:[/bold] {original_r2:.4f}  "
+        f"[bold]Remediated:[/bold] {remediated_r2:.4f}  "
+        f"[bold]Δ:[/bold] [{r2_color}]{r2_delta:+.4f}[/{r2_color}]",
+    )
 
 
 def main() -> None:
@@ -80,6 +177,12 @@ def main() -> None:
     x_train_remediated = engineer_promotion_rate(artifacts.x_train)
     vif_after = compute_vif(x_train_remediated)
     report_vif(vif_after, "VIF — After Remediation (Promotion_Rate)")
+
+    console.print()
+
+    original_ols = fit_ols(artifacts.x_train, artifacts.y_train)
+    remediated_ols = fit_ols(x_train_remediated, artifacts.y_train)
+    report_ols_comparison(original_ols, remediated_ols)
 
 
 if __name__ == "__main__":
