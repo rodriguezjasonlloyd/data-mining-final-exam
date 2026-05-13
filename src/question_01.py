@@ -10,24 +10,17 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-
-def _init_backend() -> str:
-    for backend in ("TkAgg", "Qt5Agg", "MacOSX", "Agg"):
-        try:
-            mpl.use(backend)
-            plt.figure()
-            plt.close()
-        except (ImportError, OSError) as error:
-            console.print(f"[dim]Backend {backend} unavailable: {error}[/dim]")
-            continue
-        else:
-            return backend
-    return "Agg"
-
-
 console = Console()
 
-_init_backend()
+for backend in ("TkAgg", "Qt5Agg", "MacOSX", "Agg"):
+    try:
+        mpl.use(backend)
+        plt.figure()
+        plt.close()
+    except ImportError, OSError:
+        continue
+    else:
+        break
 
 
 @cache
